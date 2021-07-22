@@ -1,12 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-
-using MessagePack;
-using ParadoxNotion.Serialization;
 
 using BepInEx;
-using HarmonyLib;
+
+using KK_Plugins.MaterialEditor;
 
 namespace JetPack
 {
@@ -14,7 +11,7 @@ namespace JetPack
 	{
 		public static bool Installed = false;
 		public static BaseUnityPlugin Instance = null;
-		public static Type MaterialAPI = null;
+		public static Dictionary<string, Type> Type = new Dictionary<string, Type>();
 
 		public static readonly List<string> ContainerKeys = new List<string>() { "RendererPropertyList", "MaterialShaderList", "MaterialFloatPropertyList", "MaterialColorPropertyList", "MaterialTexturePropertyList", "MaterialCopyList" };
 
@@ -22,15 +19,21 @@ namespace JetPack
 		{
 			Instance = Toolbox.GetPluginInstance("com.deathweasel.bepinex.materialeditor");
 			if (Instance == null) return;
+
 			Installed = true;
-			MaterialAPI = Instance.GetType().Assembly.GetType("MaterialEditorAPI.MaterialAPI");
+			Type["MaterialAPI"] = Instance.GetType().Assembly.GetType("MaterialEditorAPI.MaterialAPI");
+			Type["MaterialEditorCharaController"] = Instance.GetType().Assembly.GetType("KK_Plugins.MaterialEditor.MaterialEditorCharaController");
+
+			foreach (string _key in ContainerKeys)
+			{
+				string _name = "KK_Plugins.MaterialEditor.MaterialEditorCharaController+" + _key.Replace("List", "");
+				Type[_name] = Instance.GetType().Assembly.GetType(_name);
+			}
 		}
 
 		public static object GetController(ChaControl _chaCtrl)
 		{
-			if (!Installed) return null;
-
-			return Traverse.Create(Instance).Method("GetCharaController", new object[] { _chaCtrl }).GetValue();
+			return MaterialEditorPlugin.GetCharaController(_chaCtrl);
 		}
 	}
 }

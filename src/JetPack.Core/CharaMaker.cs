@@ -1,13 +1,9 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using UniRx;
 using TMPro;
 using ChaCustom;
 
@@ -39,6 +35,7 @@ namespace JetPack
 		internal static void InvokeOnMakerStartLoading(object _sender, EventArgs _args) => OnMakerStartLoading?.Invoke(_sender, _args);
 		internal static void InvokeOnMakerBaseLoaded(object _sender, EventArgs _args) => OnMakerBaseLoaded?.Invoke(_sender, _args);
 		internal static void InvokeOnMakerFinishedLoading(object _sender, EventArgs _args) => OnMakerFinishedLoading?.Invoke(_sender, _args);
+		internal static void InvokeOnSlotAdded(object _sender, SlotAddedEventArgs _args) => OnSlotAdded?.Invoke(_sender, _args);
 
 		public static class Instance
 		{
@@ -56,9 +53,6 @@ namespace JetPack
 				KKAPI.Hooks.OnMakerStartLoadingPatch();
 
 				_hookInstance = Harmony.CreateAndPatchAll(typeof(Hooks));
-
-				if (MoreAccessories.Installed)
-					_hookInstance.Patch(MoreAccessories.Instance.GetType().GetMethod("UpdateMakerUI", AccessTools.all), postfix: new HarmonyMethod(typeof(Hooks), nameof(Hooks.MoreAccessories_UpdateMakerUI_Postfix)));
 			};
 
 			OnMakerBaseLoaded += (_sender, _args) =>
@@ -72,8 +66,6 @@ namespace JetPack
 			{
 				Core.DebugLog($"[OnMakerFinishedLoading]");
 				Loaded = true;
-
-				_hookInstance.Patch(typeof(CvsAccessory).GetMethod("UpdateCustomUI", AccessTools.all), prefix: new HarmonyMethod(typeof(Hooks), nameof(Hooks.CvsAccessory_UpdateCustomUI_Prefix)));
 
 				CvsScrollable = GameObject.Find("tglSlot01/Slot01Top/tglSlot01ScrollView") != null;
 
@@ -117,8 +109,7 @@ namespace JetPack
 			OnSlotAdded += (_sender, _args) =>
 			{
 				Core.DebugLog($"[OnSlotAdded][{_args.SlotIndex}][{_args.SlotTemplate.name}]");
-				_args.SlotTemplate.GetComponent<CvsNavSideMenuEventHandler>().SlotIndex = _args.SlotIndex;
-
+				//_args.SlotTemplate.GetComponent<CvsNavSideMenuEventHandler>().SlotIndex = _args.SlotIndex;
 			};
 
 			OnCvsNavMenuClick += (_sender, _args) =>
@@ -130,53 +121,22 @@ namespace JetPack
 			{
 				Core.DebugLog($"[OnClothesCopy][{_args.SourceCoordinateIndex}][{_args.DestinationCoordinateIndex}][{_args.DestinationSlotIndex}]");
 			};
-
-			if (MoreAccessories.Installed)
-			{
-				EventInfo _event = MoreAccessories.Instance.GetType().GetEvent("onCharaMakerSlotAdded");
-				_event.AddEventHandler(MoreAccessories.Instance, new Action<int, Transform>((_slotIndex, _transform) => OnSlotAdded(null, new SlotAddedEventArgs(_slotIndex, _transform))));
-				//(MoreAccessories.Instance as MoreAccessoriesKOI.MoreAccessories).onCharaMakerSlotAdded += new Action<int, Transform>((_slotIndex, _transform) => OnSlotAdded(null, new SlotAddedEventArgs(_slotIndex, _transform)));
-			}
 		}
 
-		private class Hooks
+		internal static void UpdateAccssoryIndex()
 		{
-			internal static void MoreAccessories_UpdateMakerUI_Postfix()
-			{
-				CvsAccessory _cvsAccessory = GetCvsAccessory(CurrentAccssoryIndex);
-				if (_cvsAccessory == null || !_cvsAccessory.transform.parent.gameObject.activeSelf)
-					OnSelectedMakerSlotChanged?.Invoke(null, new SelectedMakerSlotChangedEventArgs(CurrentAccssoryIndex, -1));
-			}
+			CvsAccessory _cvsAccessory = GetCvsAccessory(CurrentAccssoryIndex);
+			int _slotIndex = CurrentAccssoryIndex;
+			if (_cvsAccessory == null || !_cvsAccessory.transform.parent.gameObject.activeSelf)
+				_slotIndex = -1;
+			else
+				_slotIndex = _cvsAccessory.nSlotNo;
+			if (_slotIndex != CurrentAccssoryIndex)
+				OnSelectedMakerSlotChanged?.Invoke(null, new SelectedMakerSlotChangedEventArgs(CurrentAccssoryIndex, _slotIndex));
+		}
 
-			internal static bool CvsAccessory_UpdateCustomUI_Prefix(CvsAccessory __instance)
-			{
-				int _slotIndex = (int) __instance.slotNo;
-				if (_slotIndex < 0)
-					return false;
-
-				ChaFileAccessory.PartsInfo _part = CustomBase.Instance.chaCtrl.GetPartsInfo(_slotIndex);
-
-				__instance.CalculateUI();
-				//__instance.Field<CvsDrawCtrl>("cmpDrawCtrl").UpdateAccessoryDraw();
-				int _value = 0;
-				if (_part != null)
-					_value = _part.type - 120;
-				Traverse _traverse = Traverse.Create(__instance);
-				_traverse.Field("ddAcsType").GetValue<TMP_Dropdown>().value = _value;
-
-				__instance.UpdateAccessoryKindInfo();
-				__instance.UpdateAccessoryParentInfo();
-				__instance.UpdateAccessoryMoveInfo();
-				__instance.ChangeSettingVisible(_value != 0);
-
-				_traverse.Field("separateColor").GetValue<GameObject>().SetActiveIfDifferent(false);
-				_traverse.Field("separateCorrect").GetValue<GameObject>().SetActiveIfDifferent(false);
-				Transform _parent = CvsScrollable ? __instance.transform.GetChild(0).GetChild(0).GetChild(0) : __instance.transform;
-				_parent.Find("objController01/Controller/imgSeparete").gameObject.SetActiveIfDifferent(_traverse.Field("objControllerTop02").GetValue<GameObject>().activeSelf);
-
-				return false;
-			}
-
+		internal partial class Hooks
+		{
 			[HarmonyPrefix]
 			[HarmonyPatch(typeof(CvsDrawCtrl), "UpdateAccessoryDraw")]
 			private static bool CvsDrawCtrl_UpdateAccessoryDraw_Prefix()
@@ -209,7 +169,7 @@ namespace JetPack
 			private static void CvsAccessory_UpdateSelectAccessoryKind_Prefix(CvsAccessory __instance, ref int __state)
 			{
 				// Used to see if the kind actually changed
-				__state = Accessory.GetPartsInfo(ChaControl, (int) __instance.slotNo).id;
+				__state = Accessory.GetPartsInfo(ChaControl, __instance.nSlotNo).id;
 			}
 
 			[HarmonyPostfix]
@@ -217,8 +177,8 @@ namespace JetPack
 			private static void CvsAccessory_UpdateSelectAccessoryKind_Postfix(CvsAccessory __instance, ref int __state)
 			{
 				// Only send the event if the kind actually changed
-				if (__state != Accessory.GetPartsInfo(ChaControl, (int) __instance.slotNo).id)
-					OnAccessoryKindChanged?.Invoke(__instance, new AccessoryKindChangedEventArgs((int) __instance.slotNo));
+				if (__state != Accessory.GetPartsInfo(ChaControl, __instance.nSlotNo).id)
+					OnAccessoryKindChanged?.Invoke(__instance, new AccessoryKindChangedEventArgs(__instance.nSlotNo));
 			}
 
 			[HarmonyBefore(new string[] { "com.joan6694.kkplugins.moreaccessories" })]
@@ -226,15 +186,15 @@ namespace JetPack
 			[HarmonyPatch(typeof(CvsAccessory), nameof(CvsAccessory.UpdateSelectAccessoryType), new[] { typeof(int) })]
 			private static void CvsAccessory_UpdateSelectAccessoryType_Prefix(CvsAccessory __instance, ref int __state)
 			{
-				__state = Accessory.GetPartsInfo(ChaControl, (int) __instance.slotNo).type;
+				__state = Accessory.GetPartsInfo(ChaControl, __instance.nSlotNo).type;
 			}
 
 			[HarmonyPostfix]
 			[HarmonyPatch(typeof(CvsAccessory), nameof(CvsAccessory.UpdateSelectAccessoryType), new[] { typeof(int) })]
 			private static void CvsAccessory_UpdateSelectAccessoryType_Postfix(CvsAccessory __instance, ref int __state)
 			{
-				ChaFileAccessory.PartsInfo _part = Accessory.GetPartsInfo(ChaControl, (int) __instance.slotNo);
-				OnAccessoryTypeChanged?.Invoke(__instance, new AccessoryTypeChangedEventArgs((int) __instance.slotNo, __state, _part.type, _part));
+				ChaFileAccessory.PartsInfo _part = Accessory.GetPartsInfo(ChaControl, __instance.nSlotNo);
+				OnAccessoryTypeChanged?.Invoke(__instance, new AccessoryTypeChangedEventArgs(__instance.nSlotNo, __state, _part.type, _part));
 			}
 
 			[HarmonyBefore(new string[] { "com.joan6694.kkplugins.moreaccessories" })]
@@ -242,15 +202,15 @@ namespace JetPack
 			[HarmonyPatch(typeof(CvsAccessory), nameof(CvsAccessory.UpdateSelectAccessoryParent), new[] { typeof(int) })]
 			private static void CvsAccessory_UpdateSelectAccessoryParent_Prefix(CvsAccessory __instance, ref string __state)
 			{
-				__state = Accessory.GetPartsInfo(ChaControl, (int) __instance.slotNo).parentKey;
+				__state = Accessory.GetPartsInfo(ChaControl, __instance.nSlotNo).parentKey;
 			}
 
 			[HarmonyPostfix]
 			[HarmonyPatch(typeof(CvsAccessory), nameof(CvsAccessory.UpdateSelectAccessoryParent), new[] { typeof(int) })]
 			private static void CvsAccessory_UpdateSelectAccessoryParent_Postfix(CvsAccessory __instance, ref string __state)
 			{
-				ChaFileAccessory.PartsInfo _part = Accessory.GetPartsInfo(ChaControl, (int) __instance.slotNo);
-				OnAccessoryParentChanged?.Invoke(__instance, new AccessoryParentChangedEventArgs((int) __instance.slotNo, __state, _part.parentKey, _part));
+				ChaFileAccessory.PartsInfo _part = Accessory.GetPartsInfo(ChaControl, __instance.nSlotNo);
+				OnAccessoryParentChanged?.Invoke(__instance, new AccessoryParentChangedEventArgs(__instance.nSlotNo, __state, _part.parentKey, _part));
 			}
 
 			[HarmonyPrefix]
@@ -311,7 +271,23 @@ namespace JetPack
 		internal class CvsNavSideMenuEventHandler : MonoBehaviour, IPointerClickHandler
 		{
 			public int TopIndex;
-			public int SlotIndex = -1;
+			public int SlotIndex
+			{
+				get
+				{
+					if (TopIndex == 4)
+					{
+						CvsAccessory _cvsAccessory = gameObject.GetComponentInChildren<CvsAccessory>(true);
+						if (_cvsAccessory != null)
+							return (int) _cvsAccessory.slotNo;
+						else
+							return -1;
+					}
+					else
+						return -1;
+				}
+			}
+
 			public void OnPointerClick(PointerEventData _pointerEventData)
 			{
 				Toggle _toggle = gameObject.GetComponent<Toggle>();
@@ -325,14 +301,6 @@ namespace JetPack
 			internal void Init(int _topIndex)
 			{
 				TopIndex = _topIndex;
-				if (TopIndex == 4)
-				{
-					CvsAccessory _cvsAccessory = gameObject.GetComponentInChildren<CvsAccessory>(true);
-					if (_cvsAccessory != null)
-						SlotIndex = (int) _cvsAccessory.slotNo;
-					else
-						SlotIndex = -1;
-				}
 			}
 		}
 

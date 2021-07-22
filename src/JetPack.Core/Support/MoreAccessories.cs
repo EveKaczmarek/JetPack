@@ -1,14 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-
-using UnityEngine;
-using TMPro;
-using ChaCustom;
 
 using BepInEx;
 using HarmonyLib;
+
+using static MoreAccessoriesKOI.MoreAccessories;
 
 namespace JetPack
 {
@@ -16,7 +13,7 @@ namespace JetPack
 	{
 		public static bool Installed = false;
 		public static BaseUnityPlugin Instance = null;
-		public static bool NewVer = false;
+		public static bool NewVer = true;
 
 		private static Type _type = null;
 		private static object _accessoriesByChar;
@@ -26,16 +23,16 @@ namespace JetPack
 		{
 			Instance = Toolbox.GetPluginInstance("com.joan6694.illusionplugins.moreaccessories");
 			if (Instance == null) return;
+
 			Installed = true;
-			NewVer = Toolbox.PluginVersionCompare(Instance, "1.1.0");
-			Core.DebugLog($"MoreAccessories {Instance.Info.Metadata.Version} found, NewVer: {NewVer}");
 			_type = Instance.GetType();
-			_accessoriesByChar = Traverse.Create(Instance).Field("_accessoriesByChar").GetValue();
+			_accessoriesByChar = _self._accessoriesByChar;
 		}
 
 		internal static void OnMakerBaseLoaded()
 		{
 			if (!Installed) return;
+
 			_hookInstance = Harmony.CreateAndPatchAll(typeof(Hooks));
 		}
 
@@ -43,22 +40,37 @@ namespace JetPack
 		{
 			if (!Installed) return;
 
-			_hookInstance.Patch(GetCvsPatchType("UpdateCustomUI").GetMethod("Prefix", AccessTools.all), prefix: new HarmonyMethod(typeof(Hooks), nameof(Hooks.ReturnFalse)));
+			_hookInstance.Patch(GetCvsPatchType("CvsAccessory_UpdateCustomUI").GetMethod("Prefix", AccessTools.all), prefix: new HarmonyMethod(typeof(Hooks), nameof(Hooks.ReturnFalse)));
+			//_hookInstance.Unpatch(typeof(CvsAccessory).GetMethod("UpdateCustomUI"), HarmonyPatchType.Prefix, "com.joan6694.kkplugins.moreaccessories");
+
+			_hookInstance.Patch(_type.GetMethod("UpdateMakerUI", AccessTools.all), postfix: new HarmonyMethod(typeof(Hooks), nameof(Hooks.MoreAccessories_UpdateMakerUI_Postfix)));
 		}
 
 		internal static void OnMakerExiting()
 		{
 			if (!Installed) return;
+
 			_hookInstance.UnpatchAll(_hookInstance.Id);
 			_hookInstance = null;
 		}
 
-		public static Type GetCvsPatchType(string _methodName) => _type.Assembly.GetType($"MoreAccessoriesKOI.CvsAccessory_Patches+CvsAccessory_{_methodName}_Patches");
+		public static Type GetCvsPatchType(string _methodName) => _type.Assembly.GetType($"MoreAccessoriesKOI.CvsAccessory_Patches+{_methodName}_Patches");
+		internal static partial class Hooks
+		{
+			internal static bool ReturnFalse() => false;
+
+			internal static void MoreAccessories_UpdateMakerUI_Postfix()
+			{
+				CharaMaker.UpdateAccssoryIndex();
+			}
+		}
 
 		public static void CheckAndPadPartInfo(ChaControl _chaCtrl, int _coordinateIndex, int _slotIndex)
 		{
+			if (!Installed) return;
+
 			List<ChaFileAccessory.PartsInfo> _parts = ListMorePartsInfo(_chaCtrl, _coordinateIndex);
-			if (!Installed || _parts == null) return;
+			if (_parts == null) return;
 
 			for (int i = _parts.Count; i < _slotIndex + 1; i++)
 			{
@@ -72,36 +84,37 @@ namespace JetPack
 			List<ChaFileAccessory.PartsInfo> _parts = new List<ChaFileAccessory.PartsInfo>();
 			if (!Installed) return _parts;
 
-			object _charAdditionalData = GetCharAdditionalData(_chaCtrl);
+			CharAdditionalData _charAdditionalData = GetCharAdditionalData(_chaCtrl);
 			if (_charAdditionalData == null) return _parts;
-			object _rawAccessoriesInfos = Traverse.Create(_charAdditionalData).Field("rawAccessoriesInfos").GetValue();
+			Dictionary<int, List<ChaFileAccessory.PartsInfo>> _rawAccessoriesInfos = _charAdditionalData.rawAccessoriesInfos;
 			if (_rawAccessoriesInfos == null) return _parts;
-			if (NewVer)
-				(_rawAccessoriesInfos as Dictionary<int, List<ChaFileAccessory.PartsInfo>>).TryGetValue(_coordinateIndex, out _parts);
-			else
-				(_rawAccessoriesInfos as Dictionary<ChaFileDefine.CoordinateType, List<ChaFileAccessory.PartsInfo>>).TryGetValue((ChaFileDefine.CoordinateType) _coordinateIndex, out _parts);
+			_rawAccessoriesInfos.TryGetValue(_coordinateIndex, out _parts);
 			return _parts ?? new List<ChaFileAccessory.PartsInfo>();
 		}
 
-		public static List<GameObject> ListMoreObjAccessory(ChaControl _chaCtrl)
+		public static List<ChaFileAccessory.PartsInfo> ListNowAccessories(ChaControl _chaCtrl)
 		{
-			List<GameObject> _parts = new List<GameObject>();
+			if (!Installed) return null;
+
+			CharAdditionalData _charAdditionalData = GetCharAdditionalData(_chaCtrl);
+			if (_charAdditionalData == null) return null;
+			return _charAdditionalData.nowAccessories;
+		}
+
+		public static List<ChaAccessoryComponent> ListMoreChaAccessoryComponent(ChaControl _chaCtrl)
+		{
+			List<ChaAccessoryComponent> _parts = new List<ChaAccessoryComponent>();
 			if (!Installed) return _parts;
 
-			object _charAdditionalData = GetCharAdditionalData(_chaCtrl);
+			CharAdditionalData _charAdditionalData = GetCharAdditionalData(_chaCtrl);
 			if (_charAdditionalData == null) return _parts;
-			_parts = Traverse.Create(_charAdditionalData).Field("objAccessory").GetValue<List<GameObject>>();
-			return _parts ?? new List<GameObject>();
+			_parts = _charAdditionalData.cusAcsCmp;
+			return _parts ?? new List<ChaAccessoryComponent>();
 		}
 
-		public static object GetCharAdditionalData(ChaControl _chaCtrl)
+		public static CharAdditionalData GetCharAdditionalData(ChaControl _chaCtrl)
 		{
-			return _accessoriesByChar.RefTryGetValue(_chaCtrl.chaFile);
-		}
-
-		internal static class Hooks
-		{
-			internal static bool ReturnFalse() => false;
+			return _accessoriesByChar.RefTryGetValue<CharAdditionalData>(_chaCtrl.chaFile);
 		}
 	}
 }

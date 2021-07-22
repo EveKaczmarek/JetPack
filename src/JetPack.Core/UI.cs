@@ -28,5 +28,28 @@ namespace JetPack
 		}
 
 		public enum ResizeMode { MinX, MaxX, MinY, MaxY, ShiftX, ShiftY }
+
+		public static Texture2D MakePlainTex(int _width, int _height, Color _color)
+		{
+			Color[] _pix = new Color[_width * _height];
+
+			for (int i = 0; i < _pix.Length; i++)
+				_pix[i] = _color;
+
+			Texture2D _result = new Texture2D(_width, _height);
+			_result.SetPixels(_pix);
+			_result.Apply();
+
+			return _result;
+		}
+
+		// https://bensilvis.com/unity3d-auto-scale-gui/
+		public static Rect GetResizedRect(Rect _rect)
+		{
+			Vector2 _position = GUI.matrix.MultiplyVector(new Vector2(_rect.x, _rect.y));
+			Vector2 _size = GUI.matrix.MultiplyVector(new Vector2(_rect.width, _rect.height));
+
+			return new Rect(_position.x, _position.y, _size.x, _size.y);
+		}
 	}
 }

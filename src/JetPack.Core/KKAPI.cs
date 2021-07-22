@@ -1,7 +1,8 @@
 using System;
-using System.Reflection;
+using System.Linq;
 
 using UnityEngine;
+using ChaCustom;
 
 using BepInEx;
 using HarmonyLib;
@@ -10,13 +11,15 @@ namespace JetPack
 {
 	public class KKAPI
 	{
-		private static BaseUnityPlugin _instance = null;
-		private static Type _makerAPI = null;
+		internal static BaseUnityPlugin _instance = null;
+		internal static Type _makerAPI = null;
+		internal static Type _makerInterfaceCreator = null;
 
 		internal static void Init()
 		{
 			_instance = Toolbox.GetPluginInstance("marco.kkapi");
 			_makerAPI = _instance.GetType().Assembly.GetType("KKAPI.Maker.MakerAPI");
+			_makerInterfaceCreator = _instance.GetType().Assembly.GetType("KKAPI.Maker.MakerInterfaceCreator");
 			Hooks.Init();
 		}
 
@@ -31,6 +34,7 @@ namespace JetPack
 				Core.DebugLog($"[KKAPI.Hooks.OnMakerStartLoadingPatch]");
 				_hookInstance.Patch(_makerAPI.GetMethod("OnMakerBaseLoaded", AccessTools.all), postfix: new HarmonyMethod(typeof(Hooks), nameof(KKAPI_MakerAPI_OnMakerBaseLoaded_Postfix)));
 				_hookInstance.Patch(_makerAPI.GetMethod("OnMakerFinishedLoading", AccessTools.all), postfix: new HarmonyMethod(typeof(Hooks), nameof(KKAPI_MakerAPI_OnMakerFinishedLoading_Postfix)));
+				_hookInstance.Patch(_makerInterfaceCreator.GetMethod("OnMakerAccSlotAdded", AccessTools.all), postfix: new HarmonyMethod(typeof(Hooks), nameof(KKAPI_MakerInterfaceCreator_OnMakerAccSlotAdded_Postfix)));
 			}
 
 			private static void KKAPI_MakerAPI_OnMakerBaseLoaded_Postfix()
@@ -43,6 +47,16 @@ namespace JetPack
 			{
 				CharaMaker.InvokeOnMakerFinishedLoading(null, null);
 				_hookInstance.Unpatch(_makerAPI.GetMethod("OnMakerFinishedLoading", AccessTools.all), HarmonyPatchType.Postfix, _hookInstance.Id);
+			}
+
+			internal static void KKAPI_MakerInterfaceCreator_OnMakerAccSlotAdded_Postfix(Transform newSlotTransform)
+			{
+				CvsAccessory _cmp = newSlotTransform.GetComponentsInParent<CvsAccessory>(true)?.FirstOrDefault();
+				if (_cmp == null) return;
+
+				Transform _transform = newSlotTransform.GetComponentsInParent<CharaMaker.CvsNavSideMenuEventHandler>(true)?.FirstOrDefault()?.transform;
+				int _slotIndex = _cmp.nSlotNo;
+				CharaMaker.InvokeOnSlotAdded(MoreAccessoriesKOI.MoreAccessories._self, new CharaMaker.SlotAddedEventArgs(_slotIndex, _transform));
 			}
 		}
 	}

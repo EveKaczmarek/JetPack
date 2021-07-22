@@ -14,6 +14,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)CharaHscene.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Accessory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CharaMaker.Event.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CharaMaker.Hooks.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Studio.UI.cs" />
@@ -24,8 +25,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)Studio.TreeNodes.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)KKAPI.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Support\MoreAccessories.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Support\MoreOutfits.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Support\MaterialEditor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Properties\AssemblyInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Toolbox.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UI.cs" />
   </ItemGroup>
 </Project>

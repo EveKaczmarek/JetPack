@@ -1,14 +1,11 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 using UnityEngine;
 using UnityEngine.UI;
 using ChaCustom;
 
-using BepInEx;
 using HarmonyLib;
 
 namespace JetPack
@@ -41,7 +38,6 @@ namespace JetPack
 			if (_objAcsMove != null)
 				return _objAcsMove.ElementAtOrDefault(_slotIndex - 20)?.ElementAtOrDefault(1);
 			return null;
-			//return (MoreAccessories.Instance as MoreAccessoriesKOI.MoreAccessories)._charaMakerData.objAcsMove?.ElementAtOrDefault(_slotIndex - 20)?.ElementAtOrDefault(1);
 		}
 
 		public static CvsAccessory GetCvsAccessory(int _slotIndex)
@@ -125,24 +121,27 @@ namespace JetPack
 			return Traverse.Create(MoreAccessories.Instance).Method("GetChaAccessoryComponent", new object[] { _chaCtrl, _slotIndex }).GetValue<ChaAccessoryComponent>();
 		}
 
+		public static List<ChaAccessoryComponent> ListChaAccessoryComponent(ChaControl _chaCtrl)
+		{
+			List<ChaAccessoryComponent> _parts = _chaCtrl.cusAcsCmp.ToList();
+			if (!MoreAccessories.Installed) return _parts;
+			_parts.AddRange(MoreAccessories.ListMoreChaAccessoryComponent(_chaCtrl));
+			return _parts;
+		}
+
 		public static GameObject GetObjAccessory(ChaControl _chaCtrl, int _slotIndex)
 		{
-			if (_slotIndex < 0) return null;
-			if (_slotIndex >= 20 && !MoreAccessories.Installed) return null;
-
-			if (_slotIndex < 20)
-				return _chaCtrl.objAccessory.ElementAtOrDefault(_slotIndex);
-			else
-				return GetChaAccessoryComponent(_chaCtrl, _slotIndex)?.gameObject;
-				//return MoreAccessories.ListMoreObjAccessory(_chaCtrl).ElementAtOrDefault(_slotIndex);
+			return _chaCtrl.GetComponentsInChildren<ListInfoComponent>(true)?.FirstOrDefault(x => x != null && x.gameObject != null && x.gameObject.name == $"ca_slot{_slotIndex:00}")?.gameObject;
 		}
 
 		public static List<GameObject> ListObjAccessory(ChaControl _chaCtrl)
 		{
-			List<GameObject> _parts = _chaCtrl.objAccessory.ToList();
-			if (MoreAccessories.Installed)
-				_parts.AddRange(MoreAccessories.ListMoreObjAccessory(_chaCtrl));
-			return _parts;
+			return _chaCtrl.GetComponentsInChildren<ListInfoComponent>(true)?.Where(x => x != null && x.gameObject != null && x.gameObject.name.StartsWith("ca_slot")).Select(x => x.gameObject).OrderBy(x => x.name).ToList() ?? new List<GameObject>();
+		}
+
+		public static List<GameObject> ListObjAccessory(GameObject _gameObject)
+		{
+			return _gameObject?.GetComponentsInChildren<ListInfoComponent>(true)?.Where(x => x != null && x.gameObject != null && x.gameObject.name.StartsWith("ca_slot")).Select(x => x.gameObject).ToList() ?? new List<GameObject>();
 		}
 
 		public static bool IsHairAccessory(ChaControl _chaCtrl, int _slotIndex)
