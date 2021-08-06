@@ -56,7 +56,6 @@ namespace JetPack
 			_hookInstance.PatchAll(typeof(HooksTreeNodes));
 		}
 
-		//public static List<TreeNodeObject> ListSelectNodes => Traverse.Create(StudioInstance.treeNodeCtrl).Property("selectNodes").GetValue<TreeNodeObject[]>().ToList();
 		public static List<TreeNodeObject> ListSelectNodes => Instance.treeNodeCtrl.selectNodes?.ToList();
 
 		public static int GetSceneId(ObjectCtrlInfo _info)
@@ -113,23 +112,23 @@ namespace JetPack
 		internal partial class HooksTreeNodes
 		{
 			[HarmonyPriority(Priority.Last)]
-			[HarmonyPostfix, HarmonyPatch(typeof(TreeNodeCtrl), nameof(TreeNodeCtrl.SelectSingle))]
-			private static void TreeNodeCtrl_SelectSingle_Postfix(TreeNodeCtrl __instance, TreeNodeObject _node, bool _deselect)
+			[HarmonyPostfix, HarmonyPatch(typeof(TreeNodeCtrl), nameof(TreeNodeCtrl.SelectSingle), new[] { typeof(TreeNodeObject), typeof(bool) })]
+			private static void TreeNodeCtrl_SelectSingle_Postfix(TreeNodeCtrl __instance, TreeNodeObject _node)
 			{
 				OnSelectSingle?.Invoke(__instance, new TreeNodeEventArgs(_node));
 			}
 
 			[HarmonyPriority(Priority.Last)]
-			[HarmonyPostfix, HarmonyPatch(typeof(TreeNodeCtrl), nameof(TreeNodeCtrl.SelectMultiple))]
-			private static void TreeNodeCtrl_SelectMultiple_Postfix(TreeNodeCtrl __instance, TreeNodeObject _start, TreeNodeObject _end)
+			[HarmonyPostfix, HarmonyPatch(typeof(TreeNodeCtrl), nameof(TreeNodeCtrl.SelectMultiple), new[] { typeof(TreeNodeObject), typeof(TreeNodeObject) })]
+			private static void TreeNodeCtrl_SelectMultiple_Postfix(TreeNodeCtrl __instance, TreeNodeObject _start)
 			{
 				OnSelectSingle?.Invoke(__instance, new TreeNodeEventArgs(_start));
 				OnSelectMultiple?.Invoke(__instance, null);
 			}
 
 			[HarmonyPriority(Priority.First)]
-			[HarmonyPrefix, HarmonyPatch(typeof(Studio.Studio), nameof(Studio.Studio.InitScene))]
-			private static void Studio_InitScene_Prefix(bool _close)
+			[HarmonyPrefix, HarmonyPatch(typeof(Studio.Studio), nameof(Studio.Studio.InitScene), new[] { typeof(bool) })]
+			private static void Studio_InitScene_Prefix()
 			{
 				Core.DebugLog($"Studio_InitScene_Prefix");
 				OnSelectSingle?.Invoke(null, new TreeNodeEventArgs(null));

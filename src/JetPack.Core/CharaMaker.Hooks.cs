@@ -11,7 +11,7 @@ namespace JetPack
 		{
 			[HarmonyPriority(Priority.First)]
 			[HarmonyPrefix, HarmonyPatch(typeof(CvsAccessory), "UpdateCustomUI")]
-			internal static bool CvsAccessory_UpdateCustomUI_Prefix(CvsAccessory __instance)
+			private static bool CvsAccessory_UpdateCustomUI_Prefix(CvsAccessory __instance)
 			{
 				if (!Loaded) return true;
 

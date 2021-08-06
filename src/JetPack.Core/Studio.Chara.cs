@@ -89,7 +89,7 @@ namespace JetPack
 				OnSelectSingle?.Invoke(Instance.treeNodeCtrl, new TreeNodeEventArgs(_selected));
 			}
 
-			if (Traverse.Create(_chara).Field<int>("select").Value != 0)
+			if (_chara.select != 0)
 				return false;
 
 			_chara.OnClickRoot(0);
