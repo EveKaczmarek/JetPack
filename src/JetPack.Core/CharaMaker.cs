@@ -19,7 +19,7 @@ namespace JetPack
 		public static CustomBase CustomBase => CustomBase.Instance;
 		public static ChaControl ChaControl => CustomBase?.chaCtrl;
 		public static int CurrentCoordinateIndex => ChaControl.fileStatus.coordinateType;
-		public static int CurrentAccssoryIndex = -1;
+		public static int CurrentAccssoryIndex = 0;
 
 		private static Harmony _hookInstance;
 
@@ -48,11 +48,9 @@ namespace JetPack
 			OnMakerStartLoading += (_sender, _args) =>
 			{
 				Core.DebugLog($"[OnMakerStartLoading]");
-				CurrentAccssoryIndex = -1;
+				CurrentAccssoryIndex = 0;
 				Inside = true;
 				KKAPI.Hooks.OnMakerStartLoadingPatch();
-
-				_hookInstance = Harmony.CreateAndPatchAll(typeof(Hooks));
 			};
 
 			OnMakerBaseLoaded += (_sender, _args) =>
@@ -66,6 +64,8 @@ namespace JetPack
 			{
 				Core.DebugLog($"[OnMakerFinishedLoading]");
 				Loaded = true;
+
+				_hookInstance = Harmony.CreateAndPatchAll(typeof(Hooks));
 
 				CvsScrollable = GameObject.Find("tglSlot01/Slot01Top/tglSlot01ScrollView") != null;
 
@@ -93,7 +93,7 @@ namespace JetPack
 			{
 				Core.DebugLog($"[OnMakerExiting]");
 
-				CurrentAccssoryIndex = -1;
+				CurrentAccssoryIndex = 0;
 				Inside = false;
 				Loaded = false;
 

@@ -110,6 +110,14 @@ namespace JetPack
 			return _partInfo;
 		}
 
+		public static List<ChaFileAccessory.PartsInfo> ListNowAccessories(ChaControl _chaCtrl)
+		{
+			List<ChaFileAccessory.PartsInfo> _partInfo = _chaCtrl.nowCoordinate.accessory.parts.ToList();
+			if (MoreAccessories.Installed)
+				_partInfo.AddRange(MoreAccessories.ListNowAccessories(_chaCtrl) ?? new List<ChaFileAccessory.PartsInfo>());
+			return _partInfo;
+		}
+
 		public static ChaAccessoryComponent GetChaAccessoryComponent(ChaControl _chaCtrl, int _slotIndex)
 		{
 			if (_slotIndex < 0) return null;

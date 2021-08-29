@@ -72,12 +72,12 @@ namespace JetPack
 				if (VR)
 				{
 					HSceneProcType = Type.GetType("VRHScene, Assembly-CSharp");
-					_hookInstance.Patch(HSceneProcType.GetMethod("MapSameObjectDisable", AccessTools.all), postfix: new HarmonyMethod(typeof(Hooks), nameof(Hooks.VRHScene_MapSameObjectDisable_PostFix)));
+					_hookInstance.Patch(HSceneProcType.GetMethod("SetShortcutKey", AccessTools.all), postfix: new HarmonyMethod(typeof(Hooks), nameof(Hooks.VRHScene_SetShortcutKey_PostFix)));
 				}
 				else
 				{
 					HSceneProcType = Type.GetType("HSceneProc, Assembly-CSharp");
-					_hookInstance.Patch(HSceneProcType.GetMethod("MapSameObjectDisable", AccessTools.all), postfix: new HarmonyMethod(typeof(Hooks), nameof(Hooks.HSceneProc_MapSameObjectDisable_PostFix)));
+					_hookInstance.Patch(HSceneProcType.GetMethod("SetShortcutKey", AccessTools.all), postfix: new HarmonyMethod(typeof(Hooks), nameof(Hooks.HSceneProc_SetShortcutKey_PostFix)));
 				}
 				_hookInstance.Patch(HSceneProcType.GetMethod("OnDestroy", AccessTools.all), prefix: new HarmonyMethod(typeof(Hooks), nameof(Hooks.HSceneProc_OnDestroy_Prefix)));
 				_hookInstance.Patch(HSceneProcType.GetMethod("SetClothStateStartMotion", AccessTools.all), postfix: new HarmonyMethod(typeof(Hooks), nameof(Hooks.HSceneProc_SetClothStateStartMotion_Postfix)));
@@ -99,7 +99,7 @@ namespace JetPack
 				OnHSceneSetClothStateStartMotion?.Invoke(null, new HSceneSetClothStateStartMotionEventArgs(___lstFemale));
 			}
 
-			private static void HSceneProc_MapSameObjectDisable_PostFix(List<ChaControl> ___lstFemale, HSprite ___sprite)
+			private static void HSceneProc_SetShortcutKey_PostFix(List<ChaControl> ___lstFemale, HSprite ___sprite)
 			{
 				if (Loaded) return;
 
@@ -109,7 +109,7 @@ namespace JetPack
 				OnHSceneFinishedLoading?.Invoke(null, new HSceneFinishedLoadingEventArgs(___lstFemale));
 			}
 
-			private static void VRHScene_MapSameObjectDisable_PostFix(List<ChaControl> ___lstFemale, HSprite[] ___sprites)
+			private static void VRHScene_SetShortcutKey_PostFix(List<ChaControl> ___lstFemale, HSprite[] ___sprites)
 			{
 				if (Loaded) return;
 

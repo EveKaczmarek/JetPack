@@ -21,12 +21,13 @@ namespace JetPack
 
 		internal static void Init()
 		{
+#if KK
 			Instance = Toolbox.GetPluginInstance("com.joan6694.illusionplugins.moreaccessories");
 			if (Instance == null) return;
-
 			Installed = true;
 			_type = Instance.GetType();
 			_accessoriesByChar = _self._accessoriesByChar;
+#endif
 		}
 
 		internal static void OnMakerBaseLoaded()
@@ -94,11 +95,12 @@ namespace JetPack
 
 		public static List<ChaFileAccessory.PartsInfo> ListNowAccessories(ChaControl _chaCtrl)
 		{
-			if (!Installed) return null;
+			List<ChaFileAccessory.PartsInfo> _parts = new List<ChaFileAccessory.PartsInfo>();
+			if (!Installed) return _parts;
 
 			CharAdditionalData _charAdditionalData = GetCharAdditionalData(_chaCtrl);
-			if (_charAdditionalData == null) return null;
-			return _charAdditionalData.nowAccessories;
+			if (_charAdditionalData == null) return _parts;
+			return _charAdditionalData.nowAccessories ?? new List<ChaFileAccessory.PartsInfo>();
 		}
 
 		public static List<ChaAccessoryComponent> ListMoreChaAccessoryComponent(ChaControl _chaCtrl)

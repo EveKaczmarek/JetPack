@@ -12,17 +12,18 @@ namespace JetPack
 {
 	[BepInPlugin(GUID, Name, Version)]
 #if KKS
-	[BepInDependency("marco.kkapi", "1.20")]
+	[BepInDependency("marco.kkapi", "1.23")]
+	[BepInDependency("com.deathweasel.bepinex.materialeditor", "3.1.2")]
 #elif KK
 	[BepInDependency("marco.kkapi", "1.17")]
 	[BepInDependency("com.joan6694.illusionplugins.moreaccessories", "1.1.0")]
+	[BepInDependency("com.deathweasel.bepinex.materialeditor", "3.1.1")]
 #endif
-	[BepInDependency("com.deathweasel.bepinex.materialeditor", "3.0")]
 	public partial class Core : BaseUnityPlugin
 	{
 		public const string GUID = "madevil.JetPack";
 		public const string Name = "JetPack";
-		public const string Version = "2.0.9.0";
+		public const string Version = "2.1.0.0";
 
 		internal static ManualLogSource _logger;
 		internal static Harmony _hookInstance;
