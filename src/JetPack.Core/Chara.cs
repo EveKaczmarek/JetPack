@@ -14,6 +14,7 @@ namespace JetPack
 			OnChangeCoordinateType += (_sender, _args) =>
 			{
 				Core.DebugLog($"[OnChangeCoordinateType][{_args.CoordinateType}][{_args.State}][{_args.DuringChange}]");
+				CharaMaker.UpdateAccssoryIndex();
 				CharaStudio.RefreshCharaStatePanel();
 			};
 		}

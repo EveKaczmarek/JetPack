@@ -10,12 +10,10 @@ namespace JetPack
 
 		internal static void Init()
 		{
-#if DEBUG
 			Instance = Toolbox.GetPluginInstance("com.deathweasel.bepinex.moreoutfits");
 			if (Instance == null) return;
 
 			Installed = true;
-#endif
 		}
 
 		internal static object GetController(ChaControl _chaCtrl)

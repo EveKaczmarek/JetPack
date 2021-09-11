@@ -24,6 +24,9 @@ namespace JetPack
 #if KK
 			Instance = Toolbox.GetPluginInstance("com.joan6694.illusionplugins.moreaccessories");
 			if (Instance == null) return;
+#if MoreAcc
+			if (Instance.GetType().Assembly.GetType("MoreAccessoriesKOI.Accessories") != null) return;
+#endif
 			Installed = true;
 			_type = Instance.GetType();
 			_accessoriesByChar = _self._accessoriesByChar;
@@ -40,11 +43,14 @@ namespace JetPack
 		internal static void OnMakerFinishedLoading()
 		{
 			if (!Installed) return;
-
+#if MoreAcc
 			_hookInstance.Patch(GetCvsPatchType("CvsAccessory_UpdateCustomUI").GetMethod("Prefix", AccessTools.all), prefix: new HarmonyMethod(typeof(Hooks), nameof(Hooks.ReturnFalse)));
 			//_hookInstance.Unpatch(typeof(CvsAccessory).GetMethod("UpdateCustomUI"), HarmonyPatchType.Prefix, "com.joan6694.kkplugins.moreaccessories");
 
 			_hookInstance.Patch(_type.GetMethod("UpdateMakerUI", AccessTools.all), postfix: new HarmonyMethod(typeof(Hooks), nameof(Hooks.MoreAccessories_UpdateMakerUI_Postfix)));
+
+			_hookInstance.Patch(_type.Assembly.GetType($"MoreAccessoriesKOI.CustomAcsChangeSlot_ChangeColorWindow_Patches").GetMethod("Prefix", AccessTools.all), prefix: new HarmonyMethod(typeof(Hooks), nameof(Hooks.ReturnFalse)));
+#endif
 		}
 
 		internal static void OnMakerExiting()
@@ -91,6 +97,16 @@ namespace JetPack
 			if (_rawAccessoriesInfos == null) return _parts;
 			_rawAccessoriesInfos.TryGetValue(_coordinateIndex, out _parts);
 			return _parts ?? new List<ChaFileAccessory.PartsInfo>();
+		}
+
+		public static List<bool> ListShowAccessories(ChaControl _chaCtrl)
+		{
+			List<bool> _parts = new List<bool>();
+			if (!Installed) return _parts;
+
+			CharAdditionalData _charAdditionalData = GetCharAdditionalData(_chaCtrl);
+			if (_charAdditionalData == null) return _parts;
+			return _charAdditionalData.showAccessories ?? new List<bool>();
 		}
 
 		public static List<ChaFileAccessory.PartsInfo> ListNowAccessories(ChaControl _chaCtrl)

@@ -9,6 +9,7 @@ namespace JetPack
 	{
 		internal partial class Hooks
 		{
+#if MoreAcc
 			[HarmonyPriority(Priority.First)]
 			[HarmonyPrefix, HarmonyPatch(typeof(CvsAccessory), "UpdateCustomUI")]
 			private static bool CvsAccessory_UpdateCustomUI_Prefix(CvsAccessory __instance)
@@ -40,6 +41,23 @@ namespace JetPack
 
 				return false;
 			}
+
+			[HarmonyPriority(Priority.First)]
+			[HarmonyPrefix, HarmonyPatch(typeof(CustomAcsChangeSlot), nameof(CustomAcsChangeSlot.ChangeColorWindow), new[] { typeof(int) })]
+			private static bool CustomAcsChangeSlot_ChangeColorWindow_Prefix(CustomAcsChangeSlot __instance, int no)
+			{
+				if (__instance.cvsColor == null)
+					return false;
+				if (!__instance.cvsColor.isOpen)
+					return false;
+
+				CvsAccessory _cmp = GetCvsAccessory(no);
+				if (_cmp != null)
+					_cmp.SetDefaultColorWindow(no);
+
+				return false;
+			}
+#endif
 		}
 	}
 }

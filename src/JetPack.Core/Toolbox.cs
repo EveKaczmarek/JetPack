@@ -136,5 +136,21 @@ namespace JetPack
 
 			return _stringBuilder.ToString();
 		}
+
+		public static string GetPath(this GameObject _self, GameObject _top) => GetGameObjectPath(_self, _top);
+		public static string GetGameObjectPath(GameObject _gameObject, GameObject _top)
+		{
+			if (_gameObject == null)
+				return "";
+
+			string _fullPath = _gameObject.name;
+			GameObject _current = _gameObject.transform.parent.gameObject;
+			while (_current != _top.gameObject)
+			{
+				_fullPath = _current.name + "/" + _fullPath;
+				_current = _current.transform.parent.gameObject;
+			};
+			return _fullPath;
+		}
 	}
 }

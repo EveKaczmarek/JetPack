@@ -26,6 +26,7 @@ namespace JetPack
 		public static int CvsMainMenu = 0;
 		public static Dictionary<int, Toggle> CvsMenuTree = new Dictionary<int, Toggle>();
 		public static bool CvsScrollable = false;
+		public static GameObject AccListContainer;
 
 		public static event EventHandler OnMakerStartLoading;
 		public static event EventHandler OnMakerBaseLoaded;
@@ -56,8 +57,10 @@ namespace JetPack
 			OnMakerBaseLoaded += (_sender, _args) =>
 			{
 				Core.DebugLog($"[OnMakerBaseLoaded]");
+#if MoreAcc
 				if (MoreAccessories.Installed)
 					MoreAccessories.OnMakerBaseLoaded();
+#endif
 			};
 
 			OnMakerFinishedLoading += (_sender, _args) =>
@@ -68,6 +71,7 @@ namespace JetPack
 				_hookInstance = Harmony.CreateAndPatchAll(typeof(Hooks));
 
 				CvsScrollable = GameObject.Find("tglSlot01/Slot01Top/tglSlot01ScrollView") != null;
+				AccListContainer = GameObject.Find("CustomScene/CustomRoot/FrontUIGroup/CustomUIGroup/CvsMenuTree/04_AccessoryTop/Slots/Viewport/Content");
 
 				int _onCustomSelectListClickCount = OnCustomSelectListClick?.GetInvocationList()?.Length ?? 0;
 				if (_onCustomSelectListClickCount > 0)
@@ -125,6 +129,8 @@ namespace JetPack
 
 		internal static void UpdateAccssoryIndex()
 		{
+			if (!Loaded) return;
+
 			CvsAccessory _cvsAccessory = GetCvsAccessory(CurrentAccssoryIndex);
 			int _slotIndex = CurrentAccssoryIndex;
 			if (_cvsAccessory == null || !_cvsAccessory.transform.parent.gameObject.activeSelf)
