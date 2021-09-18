@@ -16,17 +16,26 @@ namespace JetPack
 		public static bool NewVer = true;
 
 		private static Type _type = null;
-		private static object _accessoriesByChar;
+		private static object _accessoriesByChar = null;
 		private static Harmony _hookInstance = null;
+
+		public static bool BuggyBootleg = false;
 
 		internal static void Init()
 		{
-#if KK
-			Instance = Toolbox.GetPluginInstance("com.joan6694.illusionplugins.moreaccessories");
-			if (Instance == null) return;
+			BaseUnityPlugin _instance = Toolbox.GetPluginInstance("com.joan6694.illusionplugins.moreaccessories");
+			if (_instance == null) return;
+
+			if (_instance.GetType().Assembly.GetType("MoreAccessoriesKOI.Accessories") != null)
+			{
+				BuggyBootleg = true;
+				Core._logger.LogWarning($"BuggyBootleg MoreAccessories found, good luck :)");
 #if MoreAcc
-			if (Instance.GetType().Assembly.GetType("MoreAccessoriesKOI.Accessories") != null) return;
+				return;
 #endif
+			}
+#if KK
+			Instance = _instance;
 			Installed = true;
 			_type = Instance.GetType();
 			_accessoriesByChar = _self._accessoriesByChar;
@@ -132,7 +141,11 @@ namespace JetPack
 
 		public static CharAdditionalData GetCharAdditionalData(ChaControl _chaCtrl)
 		{
+#if MoreAcc
 			return _accessoriesByChar.RefTryGetValue<CharAdditionalData>(_chaCtrl.chaFile);
+#else
+			return null;
+#endif
 		}
 	}
 }

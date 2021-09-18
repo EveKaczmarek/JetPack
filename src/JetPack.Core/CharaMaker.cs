@@ -71,7 +71,7 @@ namespace JetPack
 				_hookInstance = Harmony.CreateAndPatchAll(typeof(Hooks));
 
 				CvsScrollable = GameObject.Find("tglSlot01/Slot01Top/tglSlot01ScrollView") != null;
-				AccListContainer = GameObject.Find("CustomScene/CustomRoot/FrontUIGroup/CustomUIGroup/CvsMenuTree/04_AccessoryTop/Slots/Viewport/Content");
+				AccListContainer = MoreAccessories.Installed ? GameObject.Find("CustomScene/CustomRoot/FrontUIGroup/CustomUIGroup/CvsMenuTree/04_AccessoryTop/Slots/Viewport/Content") : GameObject.Find("CustomScene/CustomRoot/FrontUIGroup/CustomUIGroup/CvsMenuTree/04_AccessoryTop");
 
 				int _onCustomSelectListClickCount = OnCustomSelectListClick?.GetInvocationList()?.Length ?? 0;
 				if (_onCustomSelectListClickCount > 0)
@@ -300,8 +300,7 @@ namespace JetPack
 				bool _changed = CvsMenuTree[TopIndex] != _toggle;
 				CvsMenuTree[TopIndex] = _toggle;
 
-				if (TopIndex == 4)
-					CurrentAccssoryIndex = SlotIndex;
+				CurrentAccssoryIndex = TopIndex == 4 ? SlotIndex : -1;
 				OnCvsNavMenuClick?.Invoke(null, new CvsNavMenuEventArgs(TopIndex, _toggle, _changed));
 			}
 			internal void Init(int _topIndex)
