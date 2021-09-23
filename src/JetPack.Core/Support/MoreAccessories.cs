@@ -26,7 +26,7 @@ namespace JetPack
 			BaseUnityPlugin _instance = Toolbox.GetPluginInstance("com.joan6694.illusionplugins.moreaccessories");
 			if (_instance == null) return;
 
-			if (_instance.GetType().Assembly.GetType("MoreAccessoriesKOI.Accessories") != null)
+			if (_instance.GetType().Assembly.GetType("MoreAccessoriesKOI.MoreAccessories+CharAdditionalData") == null)
 			{
 				BuggyBootleg = true;
 				Core._logger.LogWarning($"BuggyBootleg MoreAccessories found, good luck :)");

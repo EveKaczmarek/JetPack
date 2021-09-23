@@ -118,7 +118,7 @@ namespace JetPack
 
 			OnCvsNavMenuClick += (_sender, _args) =>
 			{
-				Core.DebugLog($"[OnCvsNavMenuClick][{_args.TopIndex}][{_args.SideToggle.name}][{_args.Changed}]");
+				Core.DebugLog($"[OnCvsNavMenuClick][{_args.TopIndex}][{_args.SideToggle.name}][{_args.Changed}][{CurrentAccssoryIndex}]");
 			};
 
 			OnClothesCopy += (_sender, _args) =>
@@ -266,6 +266,23 @@ namespace JetPack
 			{
 				bool _changed = CvsMainMenu != TopIndex;
 				CvsMainMenu = TopIndex;
+				if (TopIndex == 4)
+				{
+					CurrentAccssoryIndex = -1;
+					foreach (Transform _child in AccListContainer.transform)
+                    {
+						Toggle _toggle = _child.GetComponent<Toggle>();
+						if (_toggle == null) continue;
+
+						if (_toggle.isOn)
+                        {
+							CvsAccessory _cvsAccessory = _child.GetComponentInChildren<CvsAccessory>(true);
+							if (_cvsAccessory != null)
+								CurrentAccssoryIndex = _cvsAccessory.nSlotNo;
+							break;
+                        }
+                    }
+				}
 				OnCvsNavMenuClick?.Invoke(null, new CvsNavMenuEventArgs(TopIndex, CvsMenuTree[TopIndex], _changed));
 			}
 			internal void Init(int _topIndex)

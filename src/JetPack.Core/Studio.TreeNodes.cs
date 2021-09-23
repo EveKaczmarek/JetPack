@@ -112,7 +112,11 @@ namespace JetPack
 		internal partial class HooksTreeNodes
 		{
 			[HarmonyPriority(Priority.Last)]
+#if KK
 			[HarmonyPostfix, HarmonyPatch(typeof(TreeNodeCtrl), nameof(TreeNodeCtrl.SelectSingle), new[] { typeof(TreeNodeObject), typeof(bool) })]
+#else
+			[HarmonyPostfix, HarmonyPatch(typeof(TreeNodeCtrl), nameof(TreeNodeCtrl.SelectSingle), new[] { typeof(TreeNodeObject), typeof(bool), typeof(bool) })]
+#endif
 			private static void TreeNodeCtrl_SelectSingle_Postfix(TreeNodeCtrl __instance, TreeNodeObject _node)
 			{
 				OnSelectSingle?.Invoke(__instance, new TreeNodeEventArgs(_node));
