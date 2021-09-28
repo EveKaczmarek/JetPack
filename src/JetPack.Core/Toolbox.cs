@@ -144,13 +144,16 @@ namespace JetPack
 				return "";
 
 			string _fullPath = _gameObject.name;
-			GameObject _current = _gameObject.transform.parent.gameObject;
-			while (_current != _top.gameObject)
+			Transform _current = _gameObject.transform;
+			while (_current.parent != null && _current != _top?.transform)
 			{
-				_fullPath = _current.name + "/" + _fullPath;
-				_current = _current.transform.parent.gameObject;
+				_fullPath = _current.parent.name + "/" + _fullPath;
+				_current = _current.parent;
 			};
 			return _fullPath;
 		}
+
+		public static string NameFormatted(this Material _material) => _material == null ? "" : _material.name.Replace("(Instance)", "").Replace(" Instance", "").Trim();
+		public static string NameFormatted(this string _name) => _name.Replace("(Instance)", "").Replace(" Instance", "").Trim();
 	}
 }
