@@ -39,8 +39,10 @@ namespace JetPack
 				yield break;
 
 			for (int i = 0; i < ListSelectNodes.Count; i++)
+			{
 				if (Instance.dicInfo.TryGetValue(ListSelectNodes[i], out ObjectCtrlInfo _info))
 					yield return _info;
+			}
 		}
 
 		public static ChaControl GetChaControl(OICharInfo _chara)

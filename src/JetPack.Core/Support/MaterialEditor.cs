@@ -3,8 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-//using MessagePack;
-
 using BepInEx;
 using HarmonyLib;
 
@@ -21,8 +19,6 @@ namespace JetPack
 
 		public static readonly List<string> ContainerKeys = new List<string>() { "RendererPropertyList", "MaterialShaderList", "MaterialFloatPropertyList", "MaterialColorPropertyList", "MaterialTexturePropertyList", "MaterialCopyList" };
 
-		private static Harmony _hookInstance = null;
-
 		internal static void Init()
 		{
 			Instance = Toolbox.GetPluginInstance("com.deathweasel.bepinex.materialeditor");
@@ -38,7 +34,7 @@ namespace JetPack
 				Type[_name] = Instance.GetType().Assembly.GetType(_name);
 			}
 
-			_hookInstance = Harmony.CreateAndPatchAll(typeof(Hooks));
+			Core._hookInstance.PatchAll(typeof(Hooks));
 
 			OnDataApply += (_sender, _args) =>
 			{
@@ -46,10 +42,7 @@ namespace JetPack
 			};
 		}
 
-		public static object GetController(ChaControl _chaCtrl)
-		{
-			return MaterialEditorPlugin.GetCharaController(_chaCtrl);
-		}
+		public static object GetController(ChaControl _chaCtrl) => MaterialEditorPlugin.GetCharaController(_chaCtrl);
 
 		internal static partial class Hooks
 		{
@@ -94,7 +87,6 @@ namespace JetPack
 			public bool DuringChange { get; } = false;
 		}
 	}
-
 
 	public static partial class MaterialEditorExtension
 	{
@@ -165,40 +157,5 @@ namespace JetPack
 			else if (self is List<MaterialCopy>)
 				(self as List<MaterialCopy>).ForEach(new Action<MaterialCopy>(action));
 		}
-		/*
-		public static byte[] MessagePackBackup(this object self)
-		{
-			if (self is List<RendererProperty>)
-				return MessagePackSerializer.Serialize(self as List<RendererProperty>);
-			else if (self is List<MaterialFloatProperty>)
-				return MessagePackSerializer.Serialize(self as List<MaterialFloatProperty>);
-			else if (self is List<MaterialColorProperty>)
-				return MessagePackSerializer.Serialize(self as List<MaterialColorProperty>);
-			else if (self is List<MaterialTextureProperty>)
-				return MessagePackSerializer.Serialize(self as List<MaterialTextureProperty>);
-			else if (self is List<MaterialShader>)
-				return MessagePackSerializer.Serialize(self as List<MaterialShader>);
-			else if (self is List<MaterialCopy>)
-				return MessagePackSerializer.Serialize(self as List<MaterialCopy>);
-			return null;
-		}
-
-		public static object MessagePackRestore(this byte[] self, string TypeName)
-		{
-			if (TypeName == "RendererPropertyList")
-				return MessagePackSerializer.Deserialize<List<RendererProperty>>(self);
-			else if (TypeName == "MaterialFloatPropertyList")
-				return MessagePackSerializer.Deserialize<List<MaterialFloatProperty>>(self);
-			else if (TypeName == "MaterialColorPropertyList")
-				return MessagePackSerializer.Deserialize<List<MaterialColorProperty>>(self);
-			else if (TypeName == "MaterialTexturePropertyList")
-				return MessagePackSerializer.Deserialize<List<MaterialTextureProperty>>(self);
-			else if (TypeName == "MaterialShaderList")
-				return MessagePackSerializer.Deserialize<List<MaterialShader>>(self);
-			else if (TypeName == "MaterialCopyList")
-				return MessagePackSerializer.Deserialize<List<MaterialCopy>>(self);
-			return null;
-		}
-		*/
 	}
 }

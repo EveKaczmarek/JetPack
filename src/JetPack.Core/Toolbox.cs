@@ -16,7 +16,7 @@ namespace JetPack
 {
 	public static partial class Toolbox
 	{
-		public static T MessagepackClone<T>(T _object)
+		public static T MessagePackClone<T>(T _object)
 		{
 			byte[] _byte = MessagePackSerializer.Serialize(_object);
 			return MessagePackSerializer.Deserialize<T>(_byte);
@@ -155,5 +155,37 @@ namespace JetPack
 
 		public static string NameFormatted(this Material _material) => _material == null ? "" : _material.name.Replace("(Instance)", "").Replace(" Instance", "").Trim();
 		public static string NameFormatted(this string _name) => _name.Replace("(Instance)", "").Replace(" Instance", "").Trim();
+
+		public static object MessagePackDeserializer(Type _type, object _object) => MessagePackDeserializer(_type, (byte[]) _object);
+		public static object MessagePackDeserializer(Type _type, byte[] _bytes)
+		{
+			//MethodInfo _method = typeof(MessagePackSerializer).GetMethod("Deserialize", AccessTools.all, null, new[] { typeof(byte[]) }, null);
+			//MethodInfo _generic = _method.MakeGenericMethod(_type);
+
+			MethodInfo _generic = Cache.MethodInfos["MessagePackSerializer.Deserialize"].CheckOrMakeGenericMethod(_type);
+
+			return _generic.Invoke(null, new object[] { _bytes });
+		}
+	}
+
+	public static class Cache
+	{
+		public static Dictionary<string, MethodInfo> MethodInfos = new Dictionary<string, MethodInfo>();
+
+		static Cache()
+		{
+			MethodInfos["MessagePackSerializer.Deserialize"] = typeof(MessagePackSerializer).GetMethod("Deserialize", AccessTools.all, null, new[] { typeof(byte[]) }, null);
+		}
+
+		public static MethodInfo CheckOrMakeGenericMethod(this MethodInfo _self, Type _type)
+		{
+			string _key = $"Generic.{_self.DeclaringType.FullName}.{_type.FullName}";
+			if (!MethodInfos.ContainsKey(_key))
+			{
+				MethodInfos[_key] = _self.MakeGenericMethod(_type);
+				Core.DebugLog($"[CheckOrMakeGenericMethod][{_key}] cached");
+			}
+			return MethodInfos[_key];
+		}
 	}
 }

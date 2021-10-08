@@ -15,9 +15,18 @@ namespace JetPack
 		internal static Type _makerAPI = null;
 		internal static Type _makerInterfaceCreator = null;
 
+		public static bool DevelopmentBuild = false;
+
 		internal static void Init()
 		{
 			_instance = Toolbox.GetPluginInstance("marco.kkapi");
+
+			if (Toolbox.PluginVersionCompare("marco.kkapi", "1.26"))
+			{
+				DevelopmentBuild = true;
+				Core._logger.LogError($"This vsersion of KKAPI is built for development purpose instead of productive use");
+			}
+
 			_makerAPI = _instance.GetType().Assembly.GetType("KKAPI.Maker.MakerAPI");
 			_makerInterfaceCreator = _instance.GetType().Assembly.GetType("KKAPI.Maker.MakerInterfaceCreator");
 			Hooks.Init();

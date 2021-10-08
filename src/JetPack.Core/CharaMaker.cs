@@ -17,7 +17,7 @@ namespace JetPack
 		public static bool Inside { get; internal set; }
 		public static bool Loaded { get; internal set; }
 		public static CustomBase CustomBase => CustomBase.Instance;
-		public static ChaControl ChaControl => CustomBase?.chaCtrl;
+		public static ChaControl ChaControl => CustomBase.Instance?.chaCtrl;
 		public static int CurrentCoordinateIndex => ChaControl.fileStatus.coordinateType;
 		public static int CurrentAccssoryIndex = 0;
 
@@ -40,7 +40,7 @@ namespace JetPack
 
 		public static class Instance
 		{
-			public static CvsDrawCtrl CvsDrawCtrl => CustomBase.Instance.customCtrl.cmpDrawCtrl;
+			public static CvsDrawCtrl CvsDrawCtrl => CustomBase.Instance?.customCtrl?.cmpDrawCtrl;
 			public static CvsAccessoryCopy CvsAccessoryCopy => Singleton<CvsAccessoryCopy>.Instance;
 		}
 
@@ -57,10 +57,9 @@ namespace JetPack
 			OnMakerBaseLoaded += (_sender, _args) =>
 			{
 				Core.DebugLog($"[OnMakerBaseLoaded]");
-#if MoreAcc
-				if (MoreAccessories.Installed)
+
+				if (MoreAccessories.Installed && !MoreAccessories.BuggyBootleg)
 					MoreAccessories.OnMakerBaseLoaded();
-#endif
 			};
 
 			OnMakerFinishedLoading += (_sender, _args) =>
@@ -69,6 +68,9 @@ namespace JetPack
 				Loaded = true;
 
 				_hookInstance = Harmony.CreateAndPatchAll(typeof(Hooks));
+
+				if (MoreAccessories.Installed && !MoreAccessories.BuggyBootleg)
+					_hookInstance.PatchAll(typeof(HooksMoreAcc));
 
 				CvsScrollable = GameObject.Find("tglSlot01/Slot01Top/tglSlot01ScrollView") != null;
 				AccListContainer = MoreAccessories.Installed ? GameObject.Find("CustomScene/CustomRoot/FrontUIGroup/CustomUIGroup/CvsMenuTree/04_AccessoryTop/Slots/Viewport/Content") : GameObject.Find("CustomScene/CustomRoot/FrontUIGroup/CustomUIGroup/CvsMenuTree/04_AccessoryTop");
@@ -89,7 +91,8 @@ namespace JetPack
 				}
 
 				CvsNavMenuInit(Singleton<CustomChangeMainMenu>.Instance);
-				if (MoreAccessories.Installed)
+
+				if (MoreAccessories.Installed && !MoreAccessories.BuggyBootleg)
 					MoreAccessories.OnMakerFinishedLoading();
 			};
 
@@ -144,20 +147,20 @@ namespace JetPack
 		internal partial class Hooks
 		{
 			[HarmonyPrefix]
-			[HarmonyPatch(typeof(CvsDrawCtrl), "UpdateAccessoryDraw")]
+			[HarmonyPatch(typeof(CvsDrawCtrl), nameof(CvsDrawCtrl.UpdateAccessoryDraw))]
 			private static bool CvsDrawCtrl_UpdateAccessoryDraw_Prefix()
 			{
 				return false;
 			}
 
 			[HarmonyPostfix]
-			[HarmonyPatch(typeof(CvsClothesCopy), "CopyClothes")]
-			private static void CvsClothesCopy_CopyClothes_Postfix(TMP_Dropdown[] ___ddCoordeType, Toggle[] ___tglKind)
+			[HarmonyPatch(typeof(CvsClothesCopy), nameof(CvsClothesCopy.CopyClothes))]
+			private static void CvsClothesCopy_CopyClothes_Postfix(CvsClothesCopy __instance)
 			{
 				for (int i = 0; i < Enum.GetNames(typeof(ChaFileDefine.ClothesKind)).Length; i++)
 				{
-					if (___tglKind[i].isOn)
-						OnClothesCopy?.Invoke(null, new ClothesCopyEventArgs(___ddCoordeType[1].value, ___ddCoordeType[0].value, i));
+					if (__instance.tglKind[i].isOn)
+						OnClothesCopy?.Invoke(null, new ClothesCopyEventArgs(__instance.ddCoordeType[1].value, __instance.ddCoordeType[0].value, i));
 				}
 			}
 
@@ -270,18 +273,18 @@ namespace JetPack
 				{
 					CurrentAccssoryIndex = -1;
 					foreach (Transform _child in AccListContainer.transform)
-                    {
+					{
 						Toggle _toggle = _child.GetComponent<Toggle>();
 						if (_toggle == null) continue;
 
 						if (_toggle.isOn)
-                        {
+						{
 							CvsAccessory _cvsAccessory = _child.GetComponentInChildren<CvsAccessory>(true);
 							if (_cvsAccessory != null)
 								CurrentAccssoryIndex = _cvsAccessory.nSlotNo;
 							break;
-                        }
-                    }
+						}
+					}
 				}
 				OnCvsNavMenuClick?.Invoke(null, new CvsNavMenuEventArgs(TopIndex, CvsMenuTree[TopIndex], _changed));
 			}

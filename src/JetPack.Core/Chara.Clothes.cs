@@ -43,7 +43,7 @@ namespace JetPack
 			public static void CopyShoesPartsInfo(ChaControl _chaCtrl, int _coordinateIndex, int _sourceSlotIndex)
 			{
 				int _destinationSlotIndex = _sourceSlotIndex == 7 ? 8 : 7;
-				_chaCtrl.chaFile.coordinate[_coordinateIndex].clothes.parts[_destinationSlotIndex] = Toolbox.MessagepackClone(_chaCtrl.chaFile.coordinate[_coordinateIndex].clothes.parts[_sourceSlotIndex]);
+				_chaCtrl.chaFile.coordinate[_coordinateIndex].clothes.parts[_destinationSlotIndex] = Toolbox.MessagePackClone(_chaCtrl.chaFile.coordinate[_coordinateIndex].clothes.parts[_sourceSlotIndex]);
 
 				OnShoesCopy?.Invoke(_chaCtrl, new ShoesCopyEventArgs(_coordinateIndex, _sourceSlotIndex, _destinationSlotIndex));
 			}

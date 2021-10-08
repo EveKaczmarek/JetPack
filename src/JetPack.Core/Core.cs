@@ -13,16 +13,21 @@ namespace JetPack
 	[BepInPlugin(GUID, Name, Version)]
 #if KKS
 	[BepInDependency("marco.kkapi", "1.26")]
+	[BepInDependency("com.deathweasel.bepinex.materialeditor", "3.1.2")]
 #elif KK
 	[BepInDependency("marco.kkapi", "1.17")]
+	[BepInDependency("com.deathweasel.bepinex.materialeditor", "3.1.1")]
 	[BepInDependency("com.joan6694.illusionplugins.moreaccessories", "1.1.0")]
 #endif
-	[BepInDependency("com.deathweasel.bepinex.materialeditor", "3.1.5")]
 	public partial class Core : BaseUnityPlugin
 	{
 		public const string GUID = "madevil.JetPack";
+#if DEBUG
+		public const string Name = "JetPack (Debug Build)";
+#else
 		public const string Name = "JetPack";
-		public const string Version = "2.1.3.0";
+#endif
+		public const string Version = "2.1.4.0";
 
 		internal static ManualLogSource _logger;
 		internal static Harmony _hookInstance;
@@ -47,6 +52,7 @@ namespace JetPack
 		private void Start()
 		{
 			Game.HasDarkness = typeof(ChaControl).GetProperties(AccessTools.all).Any(x => x.Name == "exType");
+			Game.ConsoleActive = Traverse.Create(typeof(BepInEx.Bootstrap.Chainloader).Assembly.GetType("BepInEx.ConsoleManager")).Property("ConsoleActive").GetValue<bool>();
 
 			_hookInstance = Harmony.CreateAndPatchAll(typeof(Hooks));
 
@@ -97,6 +103,7 @@ namespace JetPack
 	public class Game
 	{
 		public static bool HasDarkness = false;
+		public static bool ConsoleActive = false;
 	}
 
 	public partial class Storage

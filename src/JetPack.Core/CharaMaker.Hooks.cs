@@ -7,11 +7,10 @@ namespace JetPack
 {
 	public partial class CharaMaker
 	{
-		internal partial class Hooks
+		internal partial class HooksMoreAcc
 		{
-#if MoreAcc
 			[HarmonyPriority(Priority.First)]
-			[HarmonyPrefix, HarmonyPatch(typeof(CvsAccessory), "UpdateCustomUI")]
+			[HarmonyPrefix, HarmonyPatch(typeof(CvsAccessory), nameof(CvsAccessory.UpdateCustomUI))]
 			private static bool CvsAccessory_UpdateCustomUI_Prefix(CvsAccessory __instance)
 			{
 				if (!Loaded) return true;
@@ -57,7 +56,6 @@ namespace JetPack
 
 				return false;
 			}
-#endif
 		}
 	}
 }
