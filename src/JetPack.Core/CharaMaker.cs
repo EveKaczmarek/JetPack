@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using TMPro;
 using ChaCustom;
 
 using HarmonyLib;
@@ -100,6 +99,8 @@ namespace JetPack
 			{
 				Core.DebugLog($"[OnMakerExiting]");
 
+				KKAPI.OnMakerExiting();
+
 				CurrentAccssoryIndex = 0;
 				Inside = false;
 				Loaded = false;
@@ -165,7 +166,7 @@ namespace JetPack
 			}
 
 			[HarmonyPostfix]
-			[HarmonyPatch(typeof(CustomAcsSelectKind), nameof(CustomAcsSelectKind.ChangeSlot), new[] { typeof(int), typeof(bool) })]
+			[HarmonyPatch(typeof(CustomAcsSelectKind), nameof(CustomAcsSelectKind.ChangeSlot), new Type[] { typeof(int), typeof(bool) })]
 			private static void CustomAcsSelectKind_ChangeSlot_Postfix(CustomAcsSelectKind __instance, int _no)
 			{
 				if (CurrentAccssoryIndex != _no)
@@ -192,14 +193,14 @@ namespace JetPack
 
 			[HarmonyBefore(new string[] { "com.joan6694.kkplugins.moreaccessories" })]
 			[HarmonyPrefix]
-			[HarmonyPatch(typeof(CvsAccessory), nameof(CvsAccessory.UpdateSelectAccessoryType), new[] { typeof(int) })]
+			[HarmonyPatch(typeof(CvsAccessory), nameof(CvsAccessory.UpdateSelectAccessoryType), new Type[] { typeof(int) })]
 			private static void CvsAccessory_UpdateSelectAccessoryType_Prefix(CvsAccessory __instance, ref int __state)
 			{
 				__state = Accessory.GetPartsInfo(ChaControl, __instance.nSlotNo).type;
 			}
 
 			[HarmonyPostfix]
-			[HarmonyPatch(typeof(CvsAccessory), nameof(CvsAccessory.UpdateSelectAccessoryType), new[] { typeof(int) })]
+			[HarmonyPatch(typeof(CvsAccessory), nameof(CvsAccessory.UpdateSelectAccessoryType), new Type[] { typeof(int) })]
 			private static void CvsAccessory_UpdateSelectAccessoryType_Postfix(CvsAccessory __instance, ref int __state)
 			{
 				ChaFileAccessory.PartsInfo _part = Accessory.GetPartsInfo(ChaControl, __instance.nSlotNo);
@@ -208,14 +209,14 @@ namespace JetPack
 
 			[HarmonyBefore(new string[] { "com.joan6694.kkplugins.moreaccessories" })]
 			[HarmonyPrefix]
-			[HarmonyPatch(typeof(CvsAccessory), nameof(CvsAccessory.UpdateSelectAccessoryParent), new[] { typeof(int) })]
+			[HarmonyPatch(typeof(CvsAccessory), nameof(CvsAccessory.UpdateSelectAccessoryParent), new Type[] { typeof(int) })]
 			private static void CvsAccessory_UpdateSelectAccessoryParent_Prefix(CvsAccessory __instance, ref string __state)
 			{
 				__state = Accessory.GetPartsInfo(ChaControl, __instance.nSlotNo).parentKey;
 			}
 
 			[HarmonyPostfix]
-			[HarmonyPatch(typeof(CvsAccessory), nameof(CvsAccessory.UpdateSelectAccessoryParent), new[] { typeof(int) })]
+			[HarmonyPatch(typeof(CvsAccessory), nameof(CvsAccessory.UpdateSelectAccessoryParent), new Type[] { typeof(int) })]
 			private static void CvsAccessory_UpdateSelectAccessoryParent_Postfix(CvsAccessory __instance, ref string __state)
 			{
 				ChaFileAccessory.PartsInfo _part = Accessory.GetPartsInfo(ChaControl, __instance.nSlotNo);
@@ -305,7 +306,7 @@ namespace JetPack
 					{
 						CvsAccessory _cvsAccessory = gameObject.GetComponentInChildren<CvsAccessory>(true);
 						if (_cvsAccessory != null)
-							return (int) _cvsAccessory.slotNo;
+							return _cvsAccessory.nSlotNo;
 						else
 							return -1;
 					}

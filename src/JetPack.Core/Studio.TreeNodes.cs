@@ -113,9 +113,9 @@ namespace JetPack
 		{
 			[HarmonyPriority(Priority.Last)]
 #if KK
-			[HarmonyPostfix, HarmonyPatch(typeof(TreeNodeCtrl), nameof(TreeNodeCtrl.SelectSingle), new[] { typeof(TreeNodeObject), typeof(bool) })]
+			[HarmonyPostfix, HarmonyPatch(typeof(TreeNodeCtrl), nameof(TreeNodeCtrl.SelectSingle), new Type[] { typeof(TreeNodeObject), typeof(bool) })]
 #else
-			[HarmonyPostfix, HarmonyPatch(typeof(TreeNodeCtrl), nameof(TreeNodeCtrl.SelectSingle), new[] { typeof(TreeNodeObject), typeof(bool), typeof(bool) })]
+			[HarmonyPostfix, HarmonyPatch(typeof(TreeNodeCtrl), nameof(TreeNodeCtrl.SelectSingle), new Type[] { typeof(TreeNodeObject), typeof(bool), typeof(bool) })]
 #endif
 			private static void TreeNodeCtrl_SelectSingle_Postfix(TreeNodeCtrl __instance, TreeNodeObject _node)
 			{
@@ -123,7 +123,7 @@ namespace JetPack
 			}
 
 			[HarmonyPriority(Priority.Last)]
-			[HarmonyPostfix, HarmonyPatch(typeof(TreeNodeCtrl), nameof(TreeNodeCtrl.SelectMultiple), new[] { typeof(TreeNodeObject), typeof(TreeNodeObject) })]
+			[HarmonyPostfix, HarmonyPatch(typeof(TreeNodeCtrl), nameof(TreeNodeCtrl.SelectMultiple), new Type[] { typeof(TreeNodeObject), typeof(TreeNodeObject) })]
 			private static void TreeNodeCtrl_SelectMultiple_Postfix(TreeNodeCtrl __instance, TreeNodeObject _start)
 			{
 				OnSelectSingle?.Invoke(__instance, new TreeNodeEventArgs(_start));
@@ -131,7 +131,7 @@ namespace JetPack
 			}
 
 			[HarmonyPriority(Priority.First)]
-			[HarmonyPrefix, HarmonyPatch(typeof(Studio.Studio), nameof(Studio.Studio.InitScene), new[] { typeof(bool) })]
+			[HarmonyPrefix, HarmonyPatch(typeof(Studio.Studio), nameof(Studio.Studio.InitScene), new Type[] { typeof(bool) })]
 			private static void Studio_InitScene_Prefix()
 			{
 				Core.DebugLog($"Studio_InitScene_Prefix");

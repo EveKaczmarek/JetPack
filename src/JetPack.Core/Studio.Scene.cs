@@ -94,7 +94,7 @@ namespace JetPack
 			private static void Studio_LoadSceneCoroutine_Postfix(string _path, ref IEnumerator __result)
 			{
 				IEnumerator original = __result;
-				__result = new[] { original, Studio_LoadSceneCoroutine_Postfix_Coroutine(_path) }.GetEnumerator();
+				__result = new IEnumerator[] { original, Studio_LoadSceneCoroutine_Postfix_Coroutine(_path) }.GetEnumerator();
 			}
 
 			private static IEnumerator Studio_LoadSceneCoroutine_Postfix_Coroutine(string _path)

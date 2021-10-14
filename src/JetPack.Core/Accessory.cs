@@ -169,21 +169,22 @@ namespace JetPack
 		{
 			if (_slotIndex < 0) return null;
 
-			if (_slotIndex < 20 || MoreAccessories.BuggyBootleg)
-				return _chaCtrl.cusAcsCmp.ElementAtOrDefault(_slotIndex);
+			GameObject _ca_slot = GetObjAccessory(_chaCtrl, _slotIndex);
+			return _ca_slot == null ? null : _ca_slot.GetComponent<ChaAccessoryComponent>();
 
-			if (_slotIndex >= 20 && !MoreAccessories.Installed) return null;
-
-			return Traverse.Create(MoreAccessories.Instance).Method("GetChaAccessoryComponent", new object[] { _chaCtrl, _slotIndex }).GetValue<ChaAccessoryComponent>();
+			//return Traverse.Create(MoreAccessories.Instance).Method("GetChaAccessoryComponent", new object[] { _chaCtrl, _slotIndex }).GetValue<ChaAccessoryComponent>();
 		}
 
 		public static List<ChaAccessoryComponent> ListChaAccessoryComponent(ChaControl _chaCtrl)
 		{
-			List<ChaAccessoryComponent> _parts = _chaCtrl.cusAcsCmp.ToList();
-
-			if (MoreAccessories.Installed && !MoreAccessories.BuggyBootleg)
-				_parts.AddRange(MoreAccessories.ListMoreChaAccessoryComponent(_chaCtrl));
-
+			List<ChaAccessoryComponent> _parts = new List<ChaAccessoryComponent>();
+			List<GameObject> _objAccessory = ListObjAccessory(_chaCtrl);
+			foreach (GameObject _ca_slot in _objAccessory)
+			{
+				ChaAccessoryComponent _cmp = _ca_slot.GetComponent<ChaAccessoryComponent>();
+				if (_cmp != null)
+					_parts.Add(_cmp);
+			}
 			return _parts;
 		}
 

@@ -14,6 +14,7 @@ namespace JetPack
 		internal static BaseUnityPlugin _instance = null;
 		internal static Type _makerAPI = null;
 		internal static Type _makerInterfaceCreator = null;
+		internal static Harmony _hookInstance;
 
 		public static bool DevelopmentBuild = false;
 
@@ -32,11 +33,17 @@ namespace JetPack
 			Hooks.Init();
 		}
 
+		internal static void OnMakerExiting()
+		{
+			_hookInstance.Unpatch(_makerInterfaceCreator.GetMethod("OnMakerAccSlotAdded", AccessTools.all), HarmonyPatchType.Postfix, _hookInstance.Id);
+		}
+
 		internal class Hooks
 		{
-			private static Harmony _hookInstance;
-
-			internal static void Init() => _hookInstance = Harmony.CreateAndPatchAll(typeof(Hooks));
+			internal static void Init()
+			{
+				_hookInstance = Harmony.CreateAndPatchAll(typeof(Hooks));
+			}
 
 			internal static void OnMakerStartLoadingPatch()
 			{

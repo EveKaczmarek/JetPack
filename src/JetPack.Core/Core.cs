@@ -27,7 +27,7 @@ namespace JetPack
 #else
 		public const string Name = "JetPack";
 #endif
-		public const string Version = "2.1.4.0";
+		public const string Version = "2.1.5.0";
 
 		internal static ManualLogSource _logger;
 		internal static Harmony _hookInstance;
@@ -56,9 +56,9 @@ namespace JetPack
 
 			_hookInstance = Harmony.CreateAndPatchAll(typeof(Hooks));
 
+			MoreAccessories.Init();
 			Chara.Init();
 			KKAPI.Init();
-			MoreAccessories.Init();
 			MoreOutfits.Init();
 			MaterialEditor.Init();
 

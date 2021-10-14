@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using UnityEngine;
+
 using BepInEx;
 using HarmonyLib;
 
@@ -63,9 +65,13 @@ namespace JetPack
 
 			_hookInstance.Patch(GetCvsPatchType("CvsAccessory_UpdateCustomUI").GetMethod("Prefix", AccessTools.all), prefix: new HarmonyMethod(typeof(Hooks), nameof(Hooks.ReturnFalse)));
 			//_hookInstance.Unpatch(typeof(CvsAccessory).GetMethod("UpdateCustomUI"), HarmonyPatchType.Prefix, "com.joan6694.kkplugins.moreaccessories");
+			_hookInstance.Patch(GetCvsPatchType("CvsAccessory_ChangeUseColorVisible").GetMethod("Prefix", AccessTools.all), prefix: new HarmonyMethod(typeof(Hooks), nameof(Hooks.ReturnFalse)));
+			_hookInstance.Patch(GetCvsPatchType("CvsAccessory_SetControllerTransform").GetMethod("Prefix", AccessTools.all), prefix: new HarmonyMethod(typeof(Hooks), nameof(Hooks.ReturnFalse)));
 
 			_hookInstance.Patch(_type.GetMethod("UpdateMakerUI", AccessTools.all), postfix: new HarmonyMethod(typeof(Hooks), nameof(Hooks.MoreAccessories_UpdateMakerUI_Postfix)));
 			_hookInstance.Patch(_type.Assembly.GetType($"MoreAccessoriesKOI.CustomAcsChangeSlot_ChangeColorWindow_Patches").GetMethod("Prefix", AccessTools.all), prefix: new HarmonyMethod(typeof(Hooks), nameof(Hooks.ReturnFalse)));
+
+			_hookInstance.Patch(_type.GetMethod("GetChaAccessoryComponent", AccessTools.all, null, new[] { typeof(ChaControl), typeof(int) }, null), prefix: new HarmonyMethod(typeof(Hooks), nameof(Hooks.MoreAccessories_GetChaAccessoryComponent_Prefix)));
 		}
 
 		internal static void OnMakerExiting()
@@ -86,6 +92,19 @@ namespace JetPack
 				if (!Installed || BuggyBootleg) return;
 
 				CharaMaker.UpdateAccssoryIndex();
+			}
+
+			internal static bool MoreAccessories_GetChaAccessoryComponent_Prefix(ChaControl character, int index, ref ChaAccessoryComponent __result)
+			{
+				if (index < 0)
+					__result = null;
+				else
+				{
+					GameObject _ca_slot = Accessory.GetObjAccessory(character, index);
+					__result = _ca_slot == null ? null : _ca_slot.GetComponent<ChaAccessoryComponent>();
+				}
+
+				return false;
 			}
 		}
 

@@ -136,7 +136,7 @@ namespace JetPack
 		internal partial class HooksChara
 		{
 			[HarmonyPriority(Priority.First)]
-			[HarmonyPrefix, HarmonyPatch(typeof(OCIChar), nameof(OCIChar.ChangeChara), new[] { typeof(string) })]
+			[HarmonyPrefix, HarmonyPatch(typeof(OCIChar), nameof(OCIChar.ChangeChara), new Type[] { typeof(string) })]
 			private static void OCIChar_ChangeChara_Prefix(OCIChar __instance, string _path)
 			{
 				// only fires when switching chara
@@ -145,7 +145,7 @@ namespace JetPack
 			}
 
 			[HarmonyPriority(Priority.Last)]
-			[HarmonyPostfix, HarmonyPatch(typeof(OCIChar), nameof(OCIChar.ChangeChara), new[] { typeof(string) })]
+			[HarmonyPostfix, HarmonyPatch(typeof(OCIChar), nameof(OCIChar.ChangeChara), new Type[] { typeof(string) })]
 			private static void OCIChar_ChangeChara_Postfix(OCIChar __instance, string _path)
 			{
 				// only fires when switching chara
@@ -174,8 +174,8 @@ namespace JetPack
 
 			[HarmonyPriority(Priority.First)]
 			[HarmonyPrefix]
-			[HarmonyPatch(typeof(AddObjectFemale), nameof(AddObjectFemale.Add), new[] { typeof(string) })]
-			[HarmonyPatch(typeof(AddObjectMale), nameof(AddObjectMale.Add), new[] { typeof(string) })]
+			[HarmonyPatch(typeof(AddObjectFemale), nameof(AddObjectFemale.Add), new Type[] { typeof(string) })]
+			[HarmonyPatch(typeof(AddObjectMale), nameof(AddObjectMale.Add), new Type[] { typeof(string) })]
 			private static void AddObjectChara_Add_Prefix()
 			{
 				// only fires when adding chara
@@ -185,8 +185,8 @@ namespace JetPack
 
 			[HarmonyPriority(Priority.Last)]
 			[HarmonyPostfix]
-			[HarmonyPatch(typeof(AddObjectFemale), nameof(AddObjectFemale.Add), new[] { typeof(string) })]
-			[HarmonyPatch(typeof(AddObjectMale), nameof(AddObjectMale.Add), new[] { typeof(string) })]
+			[HarmonyPatch(typeof(AddObjectFemale), nameof(AddObjectFemale.Add), new Type[] { typeof(string) })]
+			[HarmonyPatch(typeof(AddObjectMale), nameof(AddObjectMale.Add), new Type[] { typeof(string) })]
 			private static void AddObjectChara_Add_Postfix()
 			{
 				// only fires when adding chara
@@ -197,8 +197,8 @@ namespace JetPack
 			/*
 			[HarmonyPriority(Priority.First)]
 			[HarmonyPrefix]
-			[HarmonyPatch(typeof(AddObjectFemale), nameof(AddObjectFemale.Add), new[] { typeof(ChaControl), typeof(OICharInfo), typeof(ObjectCtrlInfo), typeof(TreeNodeObject), typeof(bool), typeof(int) })]
-			[HarmonyPatch(typeof(AddObjectMale), nameof(AddObjectMale.Add), new[] { typeof(ChaControl), typeof(OICharInfo), typeof(ObjectCtrlInfo), typeof(TreeNodeObject), typeof(bool), typeof(int) })]
+			[HarmonyPatch(typeof(AddObjectFemale), nameof(AddObjectFemale.Add), new Type[] { typeof(ChaControl), typeof(OICharInfo), typeof(ObjectCtrlInfo), typeof(TreeNodeObject), typeof(bool), typeof(int) })]
+			[HarmonyPatch(typeof(AddObjectMale), nameof(AddObjectMale.Add), new Type[] { typeof(ChaControl), typeof(OICharInfo), typeof(ObjectCtrlInfo), typeof(TreeNodeObject), typeof(bool), typeof(int) })]
 			private static void AddObjectChara_Add_Prefix_x6()
 			{
 				// fires on adding chara and loading scene
@@ -207,8 +207,8 @@ namespace JetPack
 
 			[HarmonyPriority(Priority.Last)]
 			[HarmonyPostfix]
-			[HarmonyPatch(typeof(AddObjectFemale), nameof(AddObjectFemale.Add), new[] { typeof(ChaControl), typeof(OICharInfo), typeof(ObjectCtrlInfo), typeof(TreeNodeObject), typeof(bool), typeof(int) })]
-			[HarmonyPatch(typeof(AddObjectMale), nameof(AddObjectMale.Add), new[] { typeof(ChaControl), typeof(OICharInfo), typeof(ObjectCtrlInfo), typeof(TreeNodeObject), typeof(bool), typeof(int) })]
+			[HarmonyPatch(typeof(AddObjectFemale), nameof(AddObjectFemale.Add), new Type[] { typeof(ChaControl), typeof(OICharInfo), typeof(ObjectCtrlInfo), typeof(TreeNodeObject), typeof(bool), typeof(int) })]
+			[HarmonyPatch(typeof(AddObjectMale), nameof(AddObjectMale.Add), new Type[] { typeof(ChaControl), typeof(OICharInfo), typeof(ObjectCtrlInfo), typeof(TreeNodeObject), typeof(bool), typeof(int) })]
 			private static void AddObjectChara_Add_Postfix_x6()
 			{
 				// fires on adding chara and loading scene
@@ -217,8 +217,8 @@ namespace JetPack
 			*/
 			[HarmonyPriority(Priority.First)]
 			[HarmonyPrefix]
-			[HarmonyPatch(typeof(AddObjectFemale), nameof(AddObjectFemale.Load), new[] { typeof(OICharInfo), typeof(ObjectCtrlInfo), typeof(TreeNodeObject) })]
-			[HarmonyPatch(typeof(AddObjectMale), nameof(AddObjectMale.Load), new[] { typeof(OICharInfo), typeof(ObjectCtrlInfo), typeof(TreeNodeObject) })]
+			[HarmonyPatch(typeof(AddObjectFemale), nameof(AddObjectFemale.Load), new Type[] { typeof(OICharInfo), typeof(ObjectCtrlInfo), typeof(TreeNodeObject) })]
+			[HarmonyPatch(typeof(AddObjectMale), nameof(AddObjectMale.Load), new Type[] { typeof(OICharInfo), typeof(ObjectCtrlInfo), typeof(TreeNodeObject) })]
 			private static void AddObjectChara_Load_Prefix(OICharInfo _info)
 			{
 				// only fires when loading scene
@@ -228,8 +228,8 @@ namespace JetPack
 
 			[HarmonyPriority(Priority.Last)]
 			[HarmonyPostfix]
-			[HarmonyPatch(typeof(AddObjectFemale), nameof(AddObjectFemale.Load), new[] { typeof(OICharInfo), typeof(ObjectCtrlInfo), typeof(TreeNodeObject) })]
-			[HarmonyPatch(typeof(AddObjectMale), nameof(AddObjectMale.Load), new[] { typeof(OICharInfo), typeof(ObjectCtrlInfo), typeof(TreeNodeObject) })]
+			[HarmonyPatch(typeof(AddObjectFemale), nameof(AddObjectFemale.Load), new Type[] { typeof(OICharInfo), typeof(ObjectCtrlInfo), typeof(TreeNodeObject) })]
+			[HarmonyPatch(typeof(AddObjectMale), nameof(AddObjectMale.Load), new Type[] { typeof(OICharInfo), typeof(ObjectCtrlInfo), typeof(TreeNodeObject) })]
 			private static void AddObjectChara_Load_Postfix(OICharInfo _info)
 			{
 				// only fires when loading scene

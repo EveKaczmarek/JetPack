@@ -159,7 +159,7 @@ namespace JetPack
 		public static object MessagePackDeserializer(Type _type, object _object) => MessagePackDeserializer(_type, (byte[]) _object);
 		public static object MessagePackDeserializer(Type _type, byte[] _bytes)
 		{
-			//MethodInfo _method = typeof(MessagePackSerializer).GetMethod("Deserialize", AccessTools.all, null, new[] { typeof(byte[]) }, null);
+			//MethodInfo _method = typeof(MessagePackSerializer).GetMethod("Deserialize", AccessTools.all, null, new Type[] { typeof(byte[]) }, null);
 			//MethodInfo _generic = _method.MakeGenericMethod(_type);
 
 			MethodInfo _generic = Cache.MethodInfos["MessagePackSerializer.Deserialize"].CheckOrMakeGenericMethod(_type);
@@ -174,7 +174,7 @@ namespace JetPack
 
 		static Cache()
 		{
-			MethodInfos["MessagePackSerializer.Deserialize"] = typeof(MessagePackSerializer).GetMethod("Deserialize", AccessTools.all, null, new[] { typeof(byte[]) }, null);
+			MethodInfos["MessagePackSerializer.Deserialize"] = typeof(MessagePackSerializer).GetMethod("Deserialize", AccessTools.all, null, new Type[] { typeof(byte[]) }, null);
 		}
 
 		public static MethodInfo CheckOrMakeGenericMethod(this MethodInfo _self, Type _type)
