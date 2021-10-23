@@ -27,7 +27,7 @@ namespace JetPack
 #else
 		public const string Name = "JetPack";
 #endif
-		public const string Version = "2.1.5.0";
+		public const string Version = "2.1.6.0";
 
 		internal static ManualLogSource _logger;
 		internal static Harmony _hookInstance;

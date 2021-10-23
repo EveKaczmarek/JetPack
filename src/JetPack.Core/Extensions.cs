@@ -25,6 +25,15 @@ namespace JetPack
 			return true;
 		}
 
+		public static bool SetActiveIfDifferent(this Component _self, bool _active)
+		{
+			if (_self.gameObject.activeSelf == _active)
+				return false;
+
+			_self.gameObject.SetActive(_active);
+			return true;
+		}
+
 		public static string GetFullName(this ChaControl _self) => _self.chaFile.parameter?.fullname?.Trim();
 
 		public static List<bool> GetClothesStates(this ChaControl _self, int _slotIndex) => Chara.Clothes.GetClothesStates(_self, _slotIndex);

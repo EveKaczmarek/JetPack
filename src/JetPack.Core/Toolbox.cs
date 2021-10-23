@@ -95,6 +95,15 @@ namespace JetPack
 			}
 		}
 
+		public static bool SceneIsOverlap()
+		{
+#if KK
+			return Manager.Scene.Instance.IsOverlap;
+#else
+			return Manager.Scene.IsOverlap;
+#endif
+		}
+
 		// https://stackoverflow.com/questions/8477664/how-can-i-generate-uuid-in-c-sharp
 		// https://stackoverflow.com/questions/1700361/how-to-convert-a-guid-to-a-string-in-c
 		public static string GUID(string _format = "D")
@@ -156,8 +165,8 @@ namespace JetPack
 		public static string NameFormatted(this Material _material) => _material == null ? "" : _material.name.Replace("(Instance)", "").Replace(" Instance", "").Trim();
 		public static string NameFormatted(this string _name) => _name.Replace("(Instance)", "").Replace(" Instance", "").Trim();
 
-		public static object MessagePackDeserializer(Type _type, object _object) => MessagePackDeserializer(_type, (byte[]) _object);
-		public static object MessagePackDeserializer(Type _type, byte[] _bytes)
+		public static object MessagePackGenericSerializer(Type _type, object _object) => MessagePackGenericSerializer(_type, (byte[]) _object);
+		public static object MessagePackGenericSerializer(Type _type, byte[] _bytes)
 		{
 			//MethodInfo _method = typeof(MessagePackSerializer).GetMethod("Deserialize", AccessTools.all, null, new Type[] { typeof(byte[]) }, null);
 			//MethodInfo _generic = _method.MakeGenericMethod(_type);
