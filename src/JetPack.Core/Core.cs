@@ -27,7 +27,7 @@ namespace JetPack
 #else
 		public const string Name = "JetPack";
 #endif
-		public const string Version = "2.1.6.0";
+		public const string Version = "2.1.7.0";
 
 		internal static ManualLogSource _logger;
 		internal static Harmony _hookInstance;
@@ -40,9 +40,9 @@ namespace JetPack
 
 			_cfgDebugMsg = Config.Bind("Debug", "Display debug message", false);
 
-			if (Application.dataPath.EndsWith("CharaStudio_Data"))
+			if (Application.productName == "CharaStudio")
 				CharaStudio.Running = true;
-			if (Application.dataPath.EndsWith("KoikatuVR_Data"))
+			if (Application.productName == "KoikatuVR" || Application.productName == "Koikatsu Party VR")
 			{
 				CharaHscene.Inside = true;
 				CharaHscene.VR = true;

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 using BepInEx;
 using HarmonyLib;
@@ -19,6 +20,8 @@ namespace JetPack
 
 		public static readonly List<string> ContainerKeys = new List<string>() { "RendererPropertyList", "MaterialShaderList", "MaterialFloatPropertyList", "MaterialColorPropertyList", "MaterialTexturePropertyList", "MaterialCopyList" };
 
+		private static MethodInfo _loadData = null;
+
 		internal static void Init()
 		{
 			Instance = Toolbox.GetPluginInstance("com.deathweasel.bepinex.materialeditor");
@@ -27,6 +30,8 @@ namespace JetPack
 			Installed = true;
 			Type["MaterialAPI"] = Instance.GetType().Assembly.GetType("MaterialEditorAPI.MaterialAPI");
 			Type["MaterialEditorCharaController"] = Instance.GetType().Assembly.GetType("KK_Plugins.MaterialEditor.MaterialEditorCharaController");
+
+			_loadData = Type["MaterialEditorCharaController"].GetMethod("LoadData", AccessTools.all, null, new[] { typeof(bool), typeof(bool), typeof(bool) }, null);
 
 			foreach (string _key in ContainerKeys)
 			{
@@ -59,6 +64,17 @@ namespace JetPack
 			{
 				OnDataApply?.Invoke(null, new ControllerEventArgs(__instance, "Postfix"));
 				Instance.StartCoroutine(MaterialEditorCharaController_CorrectTongue_Coroutine(__instance));
+			}
+
+			[HarmonyPriority(Priority.First)]
+			[HarmonyPrefix, HarmonyPatch(typeof(MaterialEditorCharaController), "CoordinateChangedEvent")]
+			private static bool MaterialEditorCharaController_CoordinateChangedEvent_Prefix(object __instance)
+			{
+				if (CharaMaker.Inside || CharaStudio.Running) return true;
+
+				ChaControl _chaCtrl = Traverse.Create(__instance).Property("ChaControl").GetValue<ChaControl>();
+				_chaCtrl.StartCoroutine((IEnumerator) _loadData.Invoke(__instance, new object[] { true, true, false }));
+				return false;
 			}
 		}
 

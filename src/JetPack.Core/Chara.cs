@@ -2,7 +2,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
+using Manager;
+using MessagePack;
+
+using BepInEx;
 using HarmonyLib;
 
 namespace JetPack
@@ -23,6 +28,14 @@ namespace JetPack
 				CharaMaker.UpdateAccssoryIndex();
 				CharaStudio.RefreshCharaStatePanel();
 			};
+
+			{
+				BepInEx.Bootstrap.Chainloader.PluginInfos.TryGetValue("com.bepis.bepinex.sideloader", out PluginInfo PluginInfo);
+
+				Type _type = PluginInfo.Instance.GetType().Assembly.GetType("Sideloader.AutoResolver.UniversalAutoResolver+Hooks");
+				MethodInfo _method = _type.GetMethod("ExtendedCoordinateLoad", AccessTools.all, null, new[] { typeof(ChaFileCoordinate) }, null);
+				Core._hookInstance.Patch(_method, postfix: new HarmonyMethod(typeof(Hooks), nameof(Hooks.UniversalAutoResolver_Hooks_ExtendedCoordinateLoad_Postfix)));
+			}
 		}
 
 		public static string GetCoordinateName(ChaControl _chaCtrl, int _coordinateIndex)
@@ -85,6 +98,42 @@ namespace JetPack
 				yield return Toolbox.WaitForEndOfFrame;
 				yield return Toolbox.WaitForEndOfFrame;
 				OnChangeCoordinateType?.Invoke(null, new ChangeCoordinateTypeEventArgs(__instance, (int) type, "Coroutine"));
+			}
+
+			internal static void UniversalAutoResolver_Hooks_ExtendedCoordinateLoad_Postfix(ChaFileCoordinate file)
+			{
+				if (CharaMaker.Inside || CharaStudio.Running) return;
+
+				ChaControl _chaCtrl = null;
+				ChaFile _chaFile = null;
+#if KK
+				foreach (KeyValuePair<int, ChaControl> x in Character.Instance.dictEntryChara)
+#else
+				foreach (KeyValuePair<int, ChaControl> x in Character.dictEntryChara)
+#endif
+				{
+					if (x.Value.nowCoordinate == file)
+					{
+						_chaCtrl = x.Value;
+						_chaFile = x.Value.chaFile;
+						break;
+					}
+				}
+				if (_chaFile == null) return;
+
+				int _currentCoordinateIndex = _chaFile.status.coordinateType;
+				{
+					byte[] _byte = MessagePackSerializer.Serialize(file.clothes.parts);
+					_chaCtrl.chaFile.coordinate[_currentCoordinateIndex].clothes.parts = MessagePackSerializer.Deserialize<ChaFileClothes.PartsInfo[]>(_byte);
+				}
+				{
+					byte[] _byte = MessagePackSerializer.Serialize(file.clothes.subPartsId);
+					_chaCtrl.chaFile.coordinate[_currentCoordinateIndex].clothes.subPartsId = MessagePackSerializer.Deserialize<int[]>(_byte);
+				}
+				{
+					byte[] _byte = MessagePackSerializer.Serialize(file.accessory.parts);
+					_chaCtrl.chaFile.coordinate[_currentCoordinateIndex].accessory.parts = MessagePackSerializer.Deserialize<ChaFileAccessory.PartsInfo[]>(_byte);
+				}
 			}
 		}
 	}
