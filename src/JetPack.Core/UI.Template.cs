@@ -66,21 +66,26 @@ namespace JetPack
 				ChangeRes();
 			}
 
+			protected virtual bool OnGUIshow()
+			{
+				return true;
+			}
+
 			protected virtual void OnGUI()
 			{
 				if (CharaStudio.Running)
 				{
-					if (CharaStudio.CurOCIChar == null) return;
+					//if (CharaStudio.CurOCIChar == null) return;
 				}
 				else
 				{
-					if (CustomBase.Instance?.chaCtrl == null) return;
+					//if (CustomBase.Instance?.chaCtrl == null) return;
 					if (CustomBase.Instance.customCtrl.hideFrontUI) return;
 					if (Toolbox.SceneIsOverlap()) return;
-#if KK
-					//if (!Manager.Scene.Instance.AddSceneName.IsNullOrEmpty() && Manager.Scene.Instance.AddSceneName != "CustomScene") return;
-#endif
+					if (!Toolbox.SceneAddSceneName().IsNullOrEmpty() && Toolbox.SceneAddSceneName() != "CustomScene") return;
 				}
+
+				if (!OnGUIshow()) return;
 
 				if (_ScreenRes.x != Screen.width || _ScreenRes.y != Screen.height)
 					ChangeRes();

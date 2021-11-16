@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -21,10 +20,15 @@ namespace JetPack
 
 			if (_slotIndex >= 20 && !MoreAccessories.Installed) return null;
 
-			IList _additionalCharaMakerSlots = Traverse.Create(MoreAccessories.Instance).Field("_additionalCharaMakerSlots").GetValue<IList>();
+			return CopyMoreToggle(_slotIndex);
+		}
+
+		internal static Toggle CopyMoreToggle(int _slotIndex)
+		{
+			List<MoreAccessoriesKOI.MoreAccessories.CharaMakerSlotData> _additionalCharaMakerSlots = (MoreAccessories.Instance as MoreAccessoriesKOI.MoreAccessories)._additionalCharaMakerSlots;
 			if (_slotIndex - 20 >= _additionalCharaMakerSlots?.Count) return null;
 
-			return Traverse.Create(_additionalCharaMakerSlots[_slotIndex - 20]).Field("copyToggle").GetValue<Toggle>();
+			return _additionalCharaMakerSlots.ElementAtOrDefault(_slotIndex - 20)?.copyToggle;
 		}
 
 		public static GameObject GetObjAcsMove(int _slotIndex)
@@ -57,7 +61,7 @@ namespace JetPack
 
 			if (_slotIndex >= 20 && !MoreAccessories.Installed) return null;
 
-			return Traverse.Create(MoreAccessories.Instance).Method("GetCvsAccessory", new object[] { _slotIndex }).GetValue<CvsAccessory>();
+			return MoreAccessories.GetCvsAccessory(_slotIndex);
 		}
 	}
 

@@ -27,18 +27,22 @@ namespace JetPack
 #else
 		public const string Name = "JetPack";
 #endif
-		public const string Version = "2.1.7.0";
+		public const string Version = "2.2.0.0";
 
 		internal static ManualLogSource _logger;
+		internal static Core _instance;
 		internal static Harmony _hookInstance;
 
 		private static ConfigEntry<bool> _cfgDebugMsg;
+		internal static ConfigEntry<bool> _cfgMigrationOnLoad;
+		internal static ConfigEntry<bool> _cfgMigrationCordBrowse;
 
 		private void Awake()
 		{
 			_logger = base.Logger;
+			_instance = this;
 
-			_cfgDebugMsg = Config.Bind("Debug", "Display debug message", false);
+			_cfgDebugMsg = Config.Bind("Debug", "Display debug message", false, new ConfigDescription("", null, new ConfigurationManagerAttributes { IsAdvanced = true, Order = 20 }));
 
 			if (Application.productName == "CharaStudio")
 				CharaStudio.Running = true;
@@ -47,6 +51,9 @@ namespace JetPack
 				CharaHscene.Inside = true;
 				CharaHscene.VR = true;
 			}
+
+			_cfgMigrationOnLoad = Config.Bind("Migration", "Enable OnLoad", false, new ConfigDescription("", null, new ConfigurationManagerAttributes { IsAdvanced = true, Order = 20 }));
+			_cfgMigrationCordBrowse = Config.Bind("Migration", "Coordinate Browse", false, new ConfigDescription("", null, new ConfigurationManagerAttributes { IsAdvanced = true, Order = 10 }));
 		}
 
 		private void Start()
@@ -59,6 +66,7 @@ namespace JetPack
 			MoreAccessories.Init();
 			Chara.Init();
 			KKAPI.Init();
+			Migration.Init();
 			MoreOutfits.Init();
 			MaterialEditor.Init();
 

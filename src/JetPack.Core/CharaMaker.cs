@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using ChaCustom;
 
 using HarmonyLib;
+
 using Sideloader.AutoResolver;
 
 namespace JetPack

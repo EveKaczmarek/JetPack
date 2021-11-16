@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using UnityEngine;
+using ChaCustom;
 
 using BepInEx;
 using HarmonyLib;
@@ -47,14 +48,26 @@ namespace JetPack
 				}
 #endif
 			}
-
+#if KK
 			if (!BuggyBootleg)
-				_accessoriesByChar = Traverse.Create(Instance).Field("_accessoriesByChar").GetValue();
+			{
+				InitAccessoriesByChar();
+				Hooks.Init();
+			}
+#endif
 		}
+#if KK
+		internal static void InitAccessoriesByChar()
+		{
+			if (!Installed || BuggyBootleg) return;
 
+			//_accessoriesByChar = Traverse.Create(Instance).Field("_accessoriesByChar").GetValue();
+			_accessoriesByChar = (Instance as MoreAccessoriesKOI.MoreAccessories)._accessoriesByChar;
+		}
+#endif
 		internal static void OnMakerBaseLoaded()
 		{
-			if (!Installed) return;
+			if (!Installed || BuggyBootleg) return;
 
 			_hookInstance = Harmony.CreateAndPatchAll(typeof(Hooks));
 		}
@@ -85,6 +98,12 @@ namespace JetPack
 		public static Type GetCvsPatchType(string _methodName) => _type.Assembly.GetType($"MoreAccessoriesKOI.CvsAccessory_Patches+{_methodName}_Patches");
 		internal static partial class Hooks
 		{
+			internal static void Init()
+			{
+				Core._hookInstance.Patch(typeof(ChaControl).GetMethod(nameof(ChaControl.SetAccessoryState), AccessTools.all, null, new[] { typeof(int), typeof(bool) }, null), prefix: new HarmonyMethod(typeof(Hooks), nameof(Hooks.ChaControl_SetAccessoryState_Prefix)));
+				Core._hookInstance.Patch(_type.Assembly.GetType("MoreAccessoriesKOI.ChaControl_SetAccessoryState_Patches").GetMethod("Postfix", AccessTools.all, null, new[] { typeof(ChaControl), typeof(int), typeof(bool) }, null), prefix: new HarmonyMethod(typeof(Hooks), nameof(Hooks.ReturnFalse)));
+			}
+
 			internal static bool ReturnFalse() => false;
 
 			internal static void MoreAccessories_UpdateMakerUI_Postfix()
@@ -106,6 +125,35 @@ namespace JetPack
 
 				return false;
 			}
+			internal static bool ChaControl_SetAccessoryState_Prefix(ChaControl __instance, int slotNo, bool show)
+			{
+				if (__instance == null || __instance.chaFile == null) return true;
+				if (slotNo < 20) return true;
+
+				CharAdditionalData _charAdditionalData = GetCharAdditionalData(__instance);
+				if (_charAdditionalData == null) return false;
+
+				if ((slotNo - 20) < _charAdditionalData?.showAccessories?.Count)
+					_charAdditionalData.showAccessories[slotNo - 20] = show;
+
+				return false;
+			}
+			/*
+			internal static bool MoreAccessoriesKOI_ChaControl_SetAccessoryState_Patches_Postfix_Prefix(ChaControl __0, int slotNo, bool show)
+			{
+				if (__0 == null || __0.chaFile == null) return true;
+				if (slotNo < 20) return true;
+
+				CharAdditionalData _charAdditionalData = GetCharAdditionalData(__0);
+				//(_accessoriesByChar as IDictionary<ChaFile, CharAdditionalData>).TryGetValue(__0.chaFile, out CharAdditionalData _charAdditionalData);
+				if (_charAdditionalData == null) return true;
+
+				if ((slotNo - 20) >= _charAdditionalData?.showAccessories?.Count)
+					return false;
+
+				return true;
+			}
+			*/
 		}
 
 		public static void CheckAndPadPartInfo(ChaControl _chaCtrl, int _coordinateIndex, int _slotIndex)
@@ -170,7 +218,14 @@ namespace JetPack
 		{
 			if (!Installed || BuggyBootleg) return null;
 
-			return _accessoriesByChar.RefTryGetValue<CharAdditionalData>(_chaCtrl.chaFile);
+			return _accessoriesByChar.RefTryGetValue<CharAdditionalData>(_chaCtrl?.chaFile);
+		}
+
+		public static CvsAccessory GetCvsAccessory(int _slotIndex)
+		{
+			if (!Installed || BuggyBootleg) return null;
+
+			return (Instance as MoreAccessoriesKOI.MoreAccessories).GetCvsAccessory(_slotIndex);
 		}
 	}
 }

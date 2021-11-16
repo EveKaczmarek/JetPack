@@ -95,6 +95,15 @@ namespace JetPack
 			}
 		}
 
+		public static string SceneAddSceneName()
+		{
+#if KK
+			return Manager.Scene.Instance.AddSceneName;
+#else
+			return Manager.Scene.AddSceneName;
+#endif
+		}
+
 		public static bool SceneIsOverlap()
 		{
 #if KK

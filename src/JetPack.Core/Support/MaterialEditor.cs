@@ -73,6 +73,7 @@ namespace JetPack
 				if (CharaMaker.Inside || CharaStudio.Running) return true;
 
 				ChaControl _chaCtrl = Traverse.Create(__instance).Property("ChaControl").GetValue<ChaControl>();
+				// https://stackoverflow.com/questions/66028312/c-sharp-find-a-method-by-name-and-run-it-ienumerator-method
 				_chaCtrl.StartCoroutine((IEnumerator) _loadData.Invoke(__instance, new object[] { true, true, false }));
 				return false;
 			}
@@ -106,72 +107,72 @@ namespace JetPack
 
 	public static partial class MaterialEditorExtension
 	{
-		public static void MEAddRange(this object self, object obj)
+		public static void MEAddRange(this object _self, object _object)
 		{
-			if (self is List<RendererProperty>)
-				(self as List<RendererProperty>).AddRange(obj as List<RendererProperty>);
-			else if (self is List<MaterialFloatProperty>)
-				(self as List<MaterialFloatProperty>).AddRange(obj as List<MaterialFloatProperty>);
-			else if (self is List<MaterialColorProperty>)
-				(self as List<MaterialColorProperty>).AddRange(obj as List<MaterialColorProperty>);
-			else if (self is List<MaterialTextureProperty>)
-				(self as List<MaterialTextureProperty>).AddRange(obj as List<MaterialTextureProperty>);
-			else if (self is List<MaterialShader>)
-				(self as List<MaterialShader>).AddRange(obj as List<MaterialShader>);
-			else if (self is List<MaterialCopy>)
-				(self as List<MaterialCopy>).AddRange(obj as List<MaterialCopy>);
+			if (_self is List<RendererProperty>)
+				(_self as List<RendererProperty>).AddRange(_object as List<RendererProperty>);
+			else if (_self is List<MaterialFloatProperty>)
+				(_self as List<MaterialFloatProperty>).AddRange(_object as List<MaterialFloatProperty>);
+			else if (_self is List<MaterialColorProperty>)
+				(_self as List<MaterialColorProperty>).AddRange(_object as List<MaterialColorProperty>);
+			else if (_self is List<MaterialTextureProperty>)
+				(_self as List<MaterialTextureProperty>).AddRange(_object as List<MaterialTextureProperty>);
+			else if (_self is List<MaterialShader>)
+				(_self as List<MaterialShader>).AddRange(_object as List<MaterialShader>);
+			else if (_self is List<MaterialCopy>)
+				(_self as List<MaterialCopy>).AddRange(_object as List<MaterialCopy>);
 		}
 
-		public static int MERemoveAll(this object self, Func<object, bool> match)
+		public static int MERemoveAll(this object _self, Func<object, bool> _match)
 		{
-			if (self is List<RendererProperty>)
-				return (self as List<RendererProperty>).RemoveAll(new Predicate<RendererProperty>(match));
-			else if (self is List<MaterialFloatProperty>)
-				return (self as List<MaterialFloatProperty>).RemoveAll(new Predicate<MaterialFloatProperty>(match));
-			else if (self is List<MaterialColorProperty>)
-				return (self as List<MaterialColorProperty>).RemoveAll(new Predicate<MaterialColorProperty>(match));
-			else if (self is List<MaterialTextureProperty>)
-				return (self as List<MaterialTextureProperty>).RemoveAll(new Predicate<MaterialTextureProperty>(match));
-			else if (self is List<MaterialShader>)
-				return (self as List<MaterialShader>).RemoveAll(new Predicate<MaterialShader>(match));
-			else if (self is List<MaterialCopy>)
-				return (self as List<MaterialCopy>).RemoveAll(new Predicate<MaterialCopy>(match));
+			if (_self is List<RendererProperty>)
+				return (_self as List<RendererProperty>).RemoveAll(new Predicate<RendererProperty>(_match));
+			else if (_self is List<MaterialFloatProperty>)
+				return (_self as List<MaterialFloatProperty>).RemoveAll(new Predicate<MaterialFloatProperty>(_match));
+			else if (_self is List<MaterialColorProperty>)
+				return (_self as List<MaterialColorProperty>).RemoveAll(new Predicate<MaterialColorProperty>(_match));
+			else if (_self is List<MaterialTextureProperty>)
+				return (_self as List<MaterialTextureProperty>).RemoveAll(new Predicate<MaterialTextureProperty>(_match));
+			else if (_self is List<MaterialShader>)
+				return (_self as List<MaterialShader>).RemoveAll(new Predicate<MaterialShader>(_match));
+			else if (_self is List<MaterialCopy>)
+				return (_self as List<MaterialCopy>).RemoveAll(new Predicate<MaterialCopy>(_match));
 			return 0;
 		}
 
-		public static object MEWhere(this object self, Func<object, bool> match)
+		public static object MEWhere(this object _self, Func<object, bool> _match)
 		{
-			if (self is IEnumerable<RendererProperty>)
-				return (self as IEnumerable<RendererProperty>).Where(new Func<RendererProperty, bool>(match));
-			else if (self is IEnumerable<MaterialFloatProperty>)
-				return (self as IEnumerable<MaterialFloatProperty>).Where(new Func<MaterialFloatProperty, bool>(match));
-			else if (self is IEnumerable<MaterialColorProperty>)
-				return (self as IEnumerable<MaterialColorProperty>).Where(new Func<MaterialColorProperty, bool>(match));
-			else if (self is IEnumerable<MaterialTextureProperty>)
-				return (self as IEnumerable<MaterialTextureProperty>).Where(new Func<MaterialTextureProperty, bool>(match));
-			else if (self is IEnumerable<MaterialShader>)
-				return (self as IEnumerable<MaterialShader>).Where(new Func<MaterialShader, bool>(match));
-			else if (self is IEnumerable<MaterialCopy>)
-				return (self as IEnumerable<MaterialCopy>).Where(new Func<MaterialCopy, bool>(match));
+			if (_self is IEnumerable<RendererProperty>)
+				return (_self as IEnumerable<RendererProperty>).Where(new Func<RendererProperty, bool>(_match));
+			else if (_self is IEnumerable<MaterialFloatProperty>)
+				return (_self as IEnumerable<MaterialFloatProperty>).Where(new Func<MaterialFloatProperty, bool>(_match));
+			else if (_self is IEnumerable<MaterialColorProperty>)
+				return (_self as IEnumerable<MaterialColorProperty>).Where(new Func<MaterialColorProperty, bool>(_match));
+			else if (_self is IEnumerable<MaterialTextureProperty>)
+				return (_self as IEnumerable<MaterialTextureProperty>).Where(new Func<MaterialTextureProperty, bool>(_match));
+			else if (_self is IEnumerable<MaterialShader>)
+				return (_self as IEnumerable<MaterialShader>).Where(new Func<MaterialShader, bool>(_match));
+			else if (_self is IEnumerable<MaterialCopy>)
+				return (_self as IEnumerable<MaterialCopy>).Where(new Func<MaterialCopy, bool>(_match));
 			return null;
 		}
 
-		public static void MEForEach(this object self, Action<object> action)
+		public static void MEForEach(this object _self, Action<object> _action)
 		{
-			if (self is List<RendererProperty>)
-				(self as List<RendererProperty>).ForEach(new Action<RendererProperty>(action));
-			else if (self is List<MaterialFloatProperty>)
-				(self as List<MaterialFloatProperty>).ForEach(new Action<MaterialFloatProperty>(action));
-			else if (self is List<MaterialColorProperty>)
-				(self as List<MaterialColorProperty>).ForEach(new Action<MaterialColorProperty>(action));
-			else if (self is List<RendererProperty>)
-				(self as List<RendererProperty>).ForEach(new Action<RendererProperty>(action));
-			else if (self is List<MaterialTextureProperty>)
-				(self as List<MaterialTextureProperty>).ForEach(new Action<MaterialTextureProperty>(action));
-			else if (self is List<MaterialShader>)
-				(self as List<MaterialShader>).ForEach(new Action<MaterialShader>(action));
-			else if (self is List<MaterialCopy>)
-				(self as List<MaterialCopy>).ForEach(new Action<MaterialCopy>(action));
+			if (_self is List<RendererProperty>)
+				(_self as List<RendererProperty>).ForEach(new Action<RendererProperty>(_action));
+			else if (_self is List<MaterialFloatProperty>)
+				(_self as List<MaterialFloatProperty>).ForEach(new Action<MaterialFloatProperty>(_action));
+			else if (_self is List<MaterialColorProperty>)
+				(_self as List<MaterialColorProperty>).ForEach(new Action<MaterialColorProperty>(_action));
+			else if (_self is List<RendererProperty>)
+				(_self as List<RendererProperty>).ForEach(new Action<RendererProperty>(_action));
+			else if (_self is List<MaterialTextureProperty>)
+				(_self as List<MaterialTextureProperty>).ForEach(new Action<MaterialTextureProperty>(_action));
+			else if (_self is List<MaterialShader>)
+				(_self as List<MaterialShader>).ForEach(new Action<MaterialShader>(_action));
+			else if (_self is List<MaterialCopy>)
+				(_self as List<MaterialCopy>).ForEach(new Action<MaterialCopy>(_action));
 		}
 	}
 }

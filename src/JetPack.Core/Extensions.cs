@@ -15,6 +15,7 @@ namespace JetPack
 		public static ChaFileAccessory.PartsInfo GetPartsInfo(this ChaControl _self, int _coordinateIndex, int _slotIndex) => Accessory.GetPartsInfo(_self, _coordinateIndex, _slotIndex);
 		public static bool GetAccessoryVisibility(this ChaControl _self, int _slotIndex) => Accessory.GetAccessoryVisibility(_self, _slotIndex);
 		public static GameObject GetObjAccessory(this ChaControl _self, int _slotIndex) => Accessory.GetObjAccessory(_self, _slotIndex);
+		public static string GetFullname(this ChaControl _self) => _self?.chaFile?.parameter?.fullname?.Trim();
 
 		public static bool SetActiveIfDifferent(this GameObject _self, bool _active)
 		{
