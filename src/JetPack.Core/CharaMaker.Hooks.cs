@@ -47,12 +47,7 @@ namespace JetPack
 				{
 					GameObject _ca_slot = Accessory.GetObjAccessory(CustomBase.Instance.chaCtrl, __instance.nSlotNo);
 					ChaAccessoryComponent _cmp = _ca_slot?.GetComponent<ChaAccessoryComponent>();
-					/*
-					if (__instance.nSlotNo < 20)
-						_cmp = CustomBase.Instance.chaCtrl.cusAcsCmp[__instance.nSlotNo];
-					else
-						_cmp = MoreAccessoriesKOI.MoreAccessories._self._accessoriesByChar.RefTryGetValue<MoreAccessoriesKOI.MoreAccessories.CharAdditionalData>(CustomBase.Instance.chaCtrl.chaFile).cusAcsCmp.ElementAtOrDefault(__instance.nSlotNo - 20);
-					*/
+
 					if (_ca_slot != null && _cmp != null)
 					{
 						if (_cmp.useColor01)

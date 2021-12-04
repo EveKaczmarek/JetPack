@@ -27,7 +27,7 @@ namespace JetPack
 #else
 		public const string Name = "JetPack";
 #endif
-		public const string Version = "2.2.0.0";
+		public const string Version = "2.2.3.0";
 
 		internal static ManualLogSource _logger;
 		internal static Core _instance;
@@ -44,9 +44,13 @@ namespace JetPack
 
 			_cfgDebugMsg = Config.Bind("Debug", "Display debug message", false, new ConfigDescription("", null, new ConfigurationManagerAttributes { IsAdvanced = true, Order = 20 }));
 
-			if (Application.productName == "CharaStudio")
+			if (Application.productName == Constants.StudioProcessName)
 				CharaStudio.Running = true;
-			if (Application.productName == "KoikatuVR" || Application.productName == "Koikatsu Party VR")
+			if (Application.productName == Constants.VRProcessName
+#if KK
+				|| Application.productName == Constants.VRProcessNameSteam
+#endif
+			)
 			{
 				CharaHscene.Inside = true;
 				CharaHscene.VR = true;
@@ -117,5 +121,24 @@ namespace JetPack
 	public partial class Storage
 	{
 		public static int _focusWindowID = -1;
+	}
+
+	public partial class Constants
+	{
+#if KK
+		public const string Prefix = "KK";
+		public const string GameName = "Koikatsu";
+		public const string StudioProcessName = "CharaStudio";
+		public const string MainGameProcessName = "Koikatu";
+		public const string MainGameProcessNameSteam = "Koikatsu Party";
+		public const string VRProcessName = "KoikatuVR";
+		public const string VRProcessNameSteam = "Koikatsu Party VR";
+#elif KKS
+		public const string Prefix = "KKS";
+		public const string GameName = "Koikatsu Sunshine";
+		public const string StudioProcessName = "CharaStudio";
+		public const string MainGameProcessName = "KoikatsuSunshine";
+		public const string VRProcessName = "KoikatsuSunshine_VR";
+#endif
 	}
 }

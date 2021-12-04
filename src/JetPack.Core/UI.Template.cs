@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+
+using UnityEngine;
 using ChaCustom;
 
 namespace JetPack
@@ -17,6 +19,10 @@ namespace JetPack
 						return CustomBase.Instance?.chaCtrl;
 				}
 			}
+			/*
+			public ChaControl _chaCtrl => _chaCtrlFunc?.Invoke();
+			public Func<ChaControl> _chaCtrlFunc;
+			*/
 			public int _currentCoordinateIndex => (int) _chaCtrl?.fileStatus?.coordinateType;
 
 			public int _windowRectID;
@@ -55,7 +61,12 @@ namespace JetPack
 			{
 				DontDestroyOnLoad(this);
 				enabled = false;
-
+				/*
+				if (CharaStudio.Running)
+					_chaCtrlFunc = () => CharaStudio.CurOCIChar?.charInfo;
+				else if (CharaMaker.Inside)
+					_chaCtrlFunc = () => CustomBase.Instance?.chaCtrl;
+				*/
 				_windowRectID = GUIUtility.GetControlID(FocusType.Passive);
 
 				_windowPos.x = _windowInitPos.x;

@@ -17,6 +17,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Accessory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CharaMaker.Event.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CharaMaker.Hooks.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Component.LookupTable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ConfigurationManagerAttributes.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core.cs" />

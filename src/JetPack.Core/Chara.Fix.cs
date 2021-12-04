@@ -85,6 +85,9 @@ namespace JetPack
 								ChaAccessoryComponent_Constructor_Postfix(__instance, _cmp);
 						}
 					}
+
+					if (_gameObject.GetComponent<ComponentLookupTable>() == null)
+						_gameObject.AddComponent<ComponentLookupTable>().Init(_gameObject);
 				};
 			}
 

@@ -174,8 +174,9 @@ namespace JetPack
 		public static string NameFormatted(this Material _material) => _material == null ? "" : _material.name.Replace("(Instance)", "").Replace(" Instance", "").Trim();
 		public static string NameFormatted(this string _name) => _name.Replace("(Instance)", "").Replace(" Instance", "").Trim();
 
-		public static object MessagePackGenericSerializer(Type _type, object _object) => MessagePackGenericSerializer(_type, (byte[]) _object);
-		public static object MessagePackGenericSerializer(Type _type, byte[] _bytes)
+		public static object MessagePackGenericDeserializer(this object _self, Type _type) => MessagePackGenericDeserializer(_type, (byte[]) _self);
+		public static object MessagePackGenericDeserializer(Type _type, object _object) => MessagePackGenericDeserializer(_type, (byte[]) _object);
+		public static object MessagePackGenericDeserializer(Type _type, byte[] _bytes)
 		{
 			//MethodInfo _method = typeof(MessagePackSerializer).GetMethod("Deserialize", AccessTools.all, null, new Type[] { typeof(byte[]) }, null);
 			//MethodInfo _generic = _method.MakeGenericMethod(_type);

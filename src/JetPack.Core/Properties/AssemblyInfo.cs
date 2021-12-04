@@ -2,9 +2,9 @@
 using static JetPack.Core;
 
 [assembly: AssemblyTitle(Name)]
-[assembly: AssemblyCompany("https://github.com/Madevil/JetPack")]
+[assembly: AssemblyCompany("https://github.com/Madevil")]
 [assembly: AssemblyDescription(Name)]
 [assembly: AssemblyProduct(Name)]
 [assembly: AssemblyVersion(Version)]
 [assembly: AssemblyFileVersion(Version)]
-[assembly: AssemblyCopyright("Copyright © 2020")]
+[assembly: AssemblyCopyright("© 2020 Madevil Evolution. All rights reserved.")]

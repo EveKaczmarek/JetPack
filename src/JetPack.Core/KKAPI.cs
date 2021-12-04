@@ -25,7 +25,7 @@ namespace JetPack
 			if (Toolbox.PluginVersionCompare("marco.kkapi", "1.26"))
 			{
 				DevelopmentBuild = true;
-				Core._logger.LogError($"This vsersion of KKAPI is built for development purpose instead of productive use");
+				Core._logger.LogError($"This version of KKAPI is built for development purpose instead of production use");
 			}
 
 			_makerAPI = _instance.GetType().Assembly.GetType("KKAPI.Maker.MakerAPI");
