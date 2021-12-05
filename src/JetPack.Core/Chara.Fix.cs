@@ -33,6 +33,19 @@ namespace JetPack
 
 	public partial class Chara
 	{
+		public static event EventHandler<LoadCharaFbxDataEventArgs> OnLoadCharaFbxData;
+		public class LoadCharaFbxDataEventArgs : EventArgs
+		{
+			public LoadCharaFbxDataEventArgs(ChaControl _chaCtrl, GameObject _gameObject)
+			{
+				ChaControl = _chaCtrl;
+				GameObject = _gameObject;
+			}
+
+			public ChaControl ChaControl { get; }
+			public GameObject GameObject { get; }
+		}
+
 		internal static partial class Hooks
 		{
 			internal static void Init()
@@ -46,8 +59,11 @@ namespace JetPack
 					Core._hookInstance.Patch(_method, postfix: new HarmonyMethod(typeof(Hooks), nameof(Hooks.UniversalAutoResolver_Hooks_ExtendedCoordinateLoad_Postfix)));
 				}
 			}
-
+#if KK
 			[HarmonyPrefix, HarmonyPatch(typeof(ChaControl), nameof(ChaControl.LoadCharaFbxDataAsync))]
+#elif KKS
+			[HarmonyPrefix, HarmonyPatch(typeof(ChaControl), nameof(ChaControl.LoadCharaFbxDataNoAsync))]
+#endif
 			internal static void ChaControl_LoadCharaFbxDataAsync_Prefix(ChaControl __instance, ref Action<GameObject> actObj)
 			{
 				Action<GameObject> _oldAct = actObj;
@@ -88,6 +104,8 @@ namespace JetPack
 
 					if (_gameObject.GetComponent<ComponentLookupTable>() == null)
 						_gameObject.AddComponent<ComponentLookupTable>().Init(_gameObject);
+
+					OnLoadCharaFbxData?.Invoke(null, new LoadCharaFbxDataEventArgs(__instance, _gameObject));
 				};
 			}
 

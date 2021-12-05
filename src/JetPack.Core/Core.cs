@@ -27,7 +27,7 @@ namespace JetPack
 #else
 		public const string Name = "JetPack";
 #endif
-		public const string Version = "2.2.4.0";
+		public const string Version = "2.2.5.0";
 
 		internal static ManualLogSource _logger;
 		internal static Core _instance;

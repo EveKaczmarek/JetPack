@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
+using UnityEngine;
+
 using HarmonyLib;
 
 namespace JetPack
@@ -80,7 +82,7 @@ namespace JetPack
 				__state = __instance.fileStatus.coordinateType;
 
 				//if ((int) type != __instance.fileStatus.coordinateType)
-					OnChangeCoordinateType?.Invoke(null, new ChangeCoordinateTypeEventArgs(__instance, (int)type, "Prefix", __state));
+					OnChangeCoordinateType?.Invoke(null, new ChangeCoordinateTypeEventArgs(__instance, (int) type, "Prefix", __state));
 			}
 
 			[HarmonyPostfix, HarmonyPatch(typeof(ChaControl), nameof(ChaControl.ChangeCoordinateType), typeof(ChaFileDefine.CoordinateType), typeof(bool))]
