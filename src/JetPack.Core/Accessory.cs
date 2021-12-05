@@ -210,9 +210,10 @@ namespace JetPack
 
 		public static bool IsHairAccessory(ChaControl _chaCtrl, int _slotIndex)
 		{
-			GameObject _gameObject = GetObjAccessory(_chaCtrl, _slotIndex);
-			if (_gameObject == null) return false;
-			return _gameObject.GetComponent<ChaCustomHairComponent>() != null;
+			if (_slotIndex < 0) return false;
+
+			GameObject _ca_slot = GetObjAccessory(_chaCtrl, _slotIndex);
+			return _ca_slot == null ? false : _ca_slot.GetComponent<ChaCustomHairComponent>() != null;
 		}
 	}
 }

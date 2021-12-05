@@ -14,6 +14,7 @@ namespace JetPack
 		internal static BaseUnityPlugin _instance = null;
 		internal static Type _makerAPI = null;
 		internal static Type _makerInterfaceCreator = null;
+		internal static Type _accessoriesApi = null;
 		internal static Harmony _hookInstance;
 
 		public static bool DevelopmentBuild = false;
@@ -30,6 +31,7 @@ namespace JetPack
 
 			_makerAPI = _instance.GetType().Assembly.GetType("KKAPI.Maker.MakerAPI");
 			_makerInterfaceCreator = _instance.GetType().Assembly.GetType("KKAPI.Maker.MakerInterfaceCreator");
+			_accessoriesApi = _instance.GetType().Assembly.GetType("KKAPI.Maker.AccessoriesApi");
 			Hooks.Init();
 		}
 
@@ -51,6 +53,9 @@ namespace JetPack
 				_hookInstance.Patch(_makerAPI.GetMethod("OnMakerBaseLoaded", AccessTools.all), postfix: new HarmonyMethod(typeof(Hooks), nameof(KKAPI_MakerAPI_OnMakerBaseLoaded_Postfix)));
 				_hookInstance.Patch(_makerAPI.GetMethod("OnMakerFinishedLoading", AccessTools.all), postfix: new HarmonyMethod(typeof(Hooks), nameof(KKAPI_MakerAPI_OnMakerFinishedLoading_Postfix)));
 				_hookInstance.Patch(_makerInterfaceCreator.GetMethod("OnMakerAccSlotAdded", AccessTools.all), postfix: new HarmonyMethod(typeof(Hooks), nameof(KKAPI_MakerInterfaceCreator_OnMakerAccSlotAdded_Postfix)));
+				_hookInstance.Patch(_accessoriesApi.GetMethod("GetAccessoryObjects", AccessTools.all), prefix: new HarmonyMethod(typeof(Hooks), nameof(KKAPI_AccessoriesApi_GetAccessoryObjects_Prefix)));
+				_hookInstance.Patch(_accessoriesApi.GetMethod("GetAccessoryObject", AccessTools.all), prefix: new HarmonyMethod(typeof(Hooks), nameof(KKAPI_AccessoriesApi_GetAccessoryObject_Prefix)));
+				_hookInstance.Patch(_accessoriesApi.GetMethod("GetAccessory", AccessTools.all), prefix: new HarmonyMethod(typeof(Hooks), nameof(KKAPI_AccessoriesApi_GetAccessory_Prefix)));
 			}
 
 			private static void KKAPI_MakerAPI_OnMakerBaseLoaded_Postfix()
@@ -65,7 +70,7 @@ namespace JetPack
 				_hookInstance.Unpatch(_makerAPI.GetMethod("OnMakerFinishedLoading", AccessTools.all), HarmonyPatchType.Postfix, _hookInstance.Id);
 			}
 
-			internal static void KKAPI_MakerInterfaceCreator_OnMakerAccSlotAdded_Postfix(Transform newSlotTransform)
+			private static void KKAPI_MakerInterfaceCreator_OnMakerAccSlotAdded_Postfix(Transform newSlotTransform)
 			{
 				CvsAccessory _cmp = newSlotTransform.GetComponentsInParent<CvsAccessory>(true)?.FirstOrDefault();
 				if (_cmp == null) return;
@@ -73,6 +78,24 @@ namespace JetPack
 				Transform _transform = newSlotTransform.GetComponentsInParent<CharaMaker.CvsNavSideMenuEventHandler>(true)?.FirstOrDefault()?.transform;
 				int _slotIndex = _cmp.nSlotNo;
 				CharaMaker.InvokeOnSlotAdded(MoreAccessoriesKOI.MoreAccessories._self, new CharaMaker.SlotAddedEventArgs(_slotIndex, _transform));
+			}
+
+			private static bool KKAPI_AccessoriesApi_GetAccessoryObjects_Prefix(ChaControl character, ref GameObject[] __result)
+			{
+				__result = Accessory.ListObjAccessory(character).ToArray();
+				return false;
+			}
+
+			private static bool KKAPI_AccessoriesApi_GetAccessoryObject_Prefix(ChaControl character, int index, ref GameObject __result)
+			{
+				__result = Accessory.GetObjAccessory(character, index);
+				return false;
+			}
+
+			private static bool KKAPI_AccessoriesApi_GetAccessory_Prefix(ChaControl character, int accessoryIndex, ref ChaAccessoryComponent __result)
+			{
+				__result = Accessory.GetChaAccessoryComponent(character, accessoryIndex);
+				return false;
 			}
 		}
 	}
