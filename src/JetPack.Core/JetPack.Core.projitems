@@ -28,6 +28,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Studio.Scene.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Studio.TreeNodes.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)KKAPI.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Support\CoordinateLoadOption.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Support\MoreAccessories.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Support\MoreOutfits.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Support\MaterialEditor.cs" />
